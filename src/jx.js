@@ -30,9 +30,9 @@ function vertical_move(game, sprite, enemy) {
 
 var GameState = function(game) {
     // Define movement constants
-    this.MAX_SPEED = 500; // pixels/second
-    this.ACCELERATION = 1500; // pixels/second/second
-    this.DRAG = 600; // pixels/second
+    this.MAX_SPEED = 300; // pixels/second
+    this.ACCELERATION = 1000; // pixels/second/second
+    this.DRAG = 800; // pixels/second
     this.GRAVITY = 2600; // pixels/second/second
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
     this.room = "start";
@@ -54,7 +54,6 @@ var GameState = function(game) {
 
 // Load images and sounds
 GameState.prototype.preload = function() {
-//    this.game.load.spritesheet('sprites', '/data/tex.png', 32, 32);
     this.game.load.atlas('sprites', '/data/tex.png', '/data/tex.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
 };
 
@@ -62,7 +61,7 @@ GameState.prototype.create_player = function() {
     this.player = this.game.add.sprite(this.game.width/8, 100, 'sprites', "ermin");
     this.player.tint = 0xffffff;
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
-    this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 1.25); // x, y
+    this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 2); // x, y
     this.player.body.drag.setTo(this.DRAG, 0); // x, y
 
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
