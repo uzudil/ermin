@@ -85,7 +85,7 @@
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":64}
+	"sourceSize": {"w":32,"h":32}
 },
 {
 	"filename": "ermin",
@@ -93,7 +93,7 @@
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":64}
+	"sourceSize": {"w":32,"h":32}
 },
 {
 	"filename": "ermin2",
@@ -101,7 +101,7 @@
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":64}
+	"sourceSize": {"w":32,"h":32}
 }
 
 ],
