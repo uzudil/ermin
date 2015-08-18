@@ -16,6 +16,18 @@ function horizontal_move(game, sprite, enemy) {
     }
 }
 
+function vertical_move(game, sprite, enemy) {
+    if(sprite.body.velocity.y == 0) sprite.body.velocity.y = enemy.speed;
+    var to_up = sprite.body.velocity.y < 0;
+    var flip = (sprite.body.touching.up && to_up) ||
+        (sprite.body.touching.down && !to_up) ||
+        (sprite.y <= 0 && to_up) ||
+        (sprite.y >= game.height - sprite.height && !to_up);
+    if (flip) {
+        sprite.body.velocity.y *= -1;
+    }
+}
+
 var GameState = function(game) {
     // Define movement constants
     this.MAX_SPEED = 500; // pixels/second
@@ -28,7 +40,14 @@ var GameState = function(game) {
         "baddy1": {
             seq: [ "baddy1", "baddy2" ],
             move: horizontal_move,
-            speed: 250
+            speed: 250,
+            gravity: true
+        },
+        "kettle1": {
+            seq: [ "kettle1", "kettle2" ],
+            move: vertical_move,
+            speed: 100,
+            gravity: false
         }
     }
 };
@@ -40,7 +59,7 @@ GameState.prototype.preload = function() {
 };
 
 GameState.prototype.create_player = function() {
-    this.player = this.game.add.sprite(this.game.width/2, 100, 'sprites', "ermin");
+    this.player = this.game.add.sprite(this.game.width/8, 100, 'sprites', "ermin");
     this.player.tint = 0xffffff;
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 1.25); // x, y
@@ -48,7 +67,7 @@ GameState.prototype.create_player = function() {
 
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
     this.player.animations.play("walk");
-    this.player.anchor.setTo(.5, 1);
+    this.player.anchor.setTo(.5, .5);
 };
 
 GameState.prototype.create_block = function(x, y, name, group, color) {
@@ -56,12 +75,13 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
     block.tint = color;
     block.start_key = name;
     this.game.physics.enable(block, Phaser.Physics.ARCADE);
-    if(group != this.enemies) {
-        block.body.immovable = true;
-        block.body.allowGravity = false;
-    } else {
+    if(group == this.enemies) {
         block.animations.add("walk", this.ENEMIES[name].seq, 10, true, false);
         block.animations.play("walk");
+        block.body.allowGravity = this.ENEMIES[name].gravity;
+    } else {
+        block.body.immovable = true;
+        block.body.allowGravity = false;
     }
     group.add(block);
 };

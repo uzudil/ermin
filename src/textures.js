@@ -9,6 +9,8 @@ TEXTURES = {
     cannon2: { x: 13, y: 0, w: 3, h: 2 },
     baddy1: { x: 24, y: 30, w: 2, h: 2 },
     baddy2: { x: 26, y: 30, w: 2, h: 2 },
+    kettle1: { x: 24, y: 28, w: 2, h: 2 },
+    kettle2: { x: 26, y: 28, w: 2, h: 2 },
     ermin: { x: 30, y: 24, w: 2, h: 4 },
 };
 
@@ -46,6 +48,7 @@ var BLOCKS = [
     ["yellow_bright", "cannon2"],
     ["white_bright", "ermin"],
     ["yellow_bright", "baddy1"],
+    ["purple", "kettle1"],
 //    ["yellow_bright", "baddy2"],
 ];
 

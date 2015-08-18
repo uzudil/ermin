@@ -64,6 +64,22 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
+	"filename": "kettle1",
+	"frame": {"x":384,"y":448,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "kettle2",
+	"frame": {"x":416,"y":448,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
 	"filename": "ermin1",
 	"frame": {"x":416,"y":384,"w":32,"h":64},
 	"rotated": false,
