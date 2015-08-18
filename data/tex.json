@@ -81,26 +81,26 @@
 },
 {
 	"filename": "ermin1",
-	"frame": {"x":416,"y":384,"w":32,"h":64},
+	"frame": {"x":416,"y":416,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":64},
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
 	"sourceSize": {"w":32,"h":64}
 },
 {
 	"filename": "ermin",
-	"frame": {"x":448,"y":384,"w":32,"h":64},
+	"frame": {"x":448,"y":416,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":64},
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
 	"sourceSize": {"w":32,"h":64}
 },
 {
 	"filename": "ermin2",
-	"frame": {"x":480,"y":384,"w":32,"h":64},
+	"frame": {"x":480,"y":416,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":64},
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
 	"sourceSize": {"w":32,"h":64}
 }
 
