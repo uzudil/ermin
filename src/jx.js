@@ -243,9 +243,9 @@ GameState.prototype.leftInputIsActive = function() {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.LEFT);
-    isActive |= (this.game.input.pointer1.isDown &&
+    isActive |= (this.game.input.pointer1.active &&
         this.game.input.pointer1.x < this.game.width/4);
-    isActive |= (this.game.input.pointer2.isDown &&
+    isActive |= (this.game.input.pointer2.active &&
         this.game.input.pointer2.x < this.game.width/4);
 
     return isActive;
@@ -258,9 +258,9 @@ GameState.prototype.rightInputIsActive = function() {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
-    isActive |= (this.game.input.pointer1.isDown &&
+    isActive |= (this.game.input.pointer1.active &&
         this.game.input.pointer1.x > this.game.width/2 + this.game.width/4);
-    isActive |= (this.game.input.pointer2.isDown &&
+    isActive |= (this.game.input.pointer2.active &&
         this.game.input.pointer2.x > this.game.width/2 + this.game.width/4);
 
     return isActive;
