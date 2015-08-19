@@ -1,0 +1,32 @@
+<html>
+<head>
+	<title>Jumper X Level Editor</title>
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/editor.css" />
+	<script src="lib/jquery-2.0.3.min.js" ></script>
+	<script src="lib/three.js" ></script>
+
+	<script src="src/common.js" ></script>
+	<script src="src/rooms.js" ></script>
+	<script src="src/textures.js" ></script>
+	<script src="src/jumperx_editor.js" ></script>
+</head>
+<body>
+    <div id="main">
+        <div id="view">
+            <div id="cursor"></div>
+            <div id="room"></div>
+            <!--<canvas id="game" width="640" height="480" style="width: 640px; height: 480px;"></canvas>-->
+        </div>
+        <div id="tools" class="clearfix"></div>
+    </div>
+    <div id="status">
+        <span id="loading" class="status_message">Loading...</span>
+        <span id="ready" class="status_message">Ready.</span>
+    </div>
+	<script>
+		$("body").ready(function() {
+            window.editor = new JumperXEditor();
+        });
+	</script>
+</body>
