@@ -243,8 +243,10 @@ GameState.prototype.leftInputIsActive = function() {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.LEFT);
-    isActive |= (this.game.input.activePointer.isDown &&
-        this.game.input.activePointer.x < this.game.width/4);
+    isActive |= (this.game.input.pointer1.isDown &&
+        this.game.input.pointer1.x < this.game.width/4);
+    isActive |= (this.game.input.pointer2.isDown &&
+        this.game.input.pointer2.x < this.game.width/4);
 
     return isActive;
 };
@@ -256,8 +258,10 @@ GameState.prototype.rightInputIsActive = function() {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
-    isActive |= (this.game.input.activePointer.isDown &&
-        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
+    isActive |= (this.game.input.pointer1.isDown &&
+        this.game.input.pointer1.x > this.game.width/2 + this.game.width/4);
+    isActive |= (this.game.input.pointer2.isDown &&
+        this.game.input.pointer2.x > this.game.width/2 + this.game.width/4);
 
     return isActive;
 };
@@ -269,9 +273,12 @@ GameState.prototype.jumpInputIsActive = function(duration) {
     var isActive = false;
 
     isActive = this.input.keyboard.downDuration(Phaser.Keyboard.UP, duration);
-    isActive |= (this.game.input.activePointer.justPressed(duration + 1000/60) &&
-        this.game.input.activePointer.x > this.game.width/4 &&
-        this.game.input.activePointer.x < this.game.width/2 + this.game.width/4);
+    isActive |= (this.game.input.pointer1.justPressed(duration + 1000/60) &&
+        this.game.input.pointer1.x > this.game.width/4 &&
+        this.game.input.pointer1.x < this.game.width/2 + this.game.width/4);
+    isActive |= (this.game.input.pointer2.justPressed(duration + 1000/60) &&
+        this.game.input.pointer2.x > this.game.width/4 &&
+        this.game.input.pointer2.x < this.game.width/2 + this.game.width/4);
 
     return isActive;
 };
