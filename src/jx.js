@@ -277,8 +277,8 @@ GameState.prototype.downInputIsActive = function(duration) {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.DOWN);
-    isActive |= (this.game.input.activePointer.isDown &&
-        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
+//    isActive |= (this.game.input.activePointer.isDown &&
+//        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
 
     return isActive;
 };
@@ -287,8 +287,8 @@ GameState.prototype.upInputIsActive = function(duration) {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.UP);
-    isActive |= (this.game.input.activePointer.isDown &&
-        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
+//    isActive |= (this.game.input.activePointer.isDown &&
+//        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
 
     return isActive;
 };
