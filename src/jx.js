@@ -117,6 +117,8 @@ GameState.prototype.create = function() {
     // Set stage background to something sky colored
     this.game.stage.backgroundColor = 0x000000;
 
+    this.game.world.scale.setTo(1, this.game.height / 600.0);
+
     this.create_player();
 
      // Since we're jumping we need gravity
@@ -160,8 +162,8 @@ GameState.prototype.update = function() {
     this.game.physics.arcade.collide(this.enemies, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.platforms);
 
-    this.game.debug.pointer(this.game.input.pointer1);
-    this.game.debug.pointer(this.game.input.pointer2);
+//    this.game.debug.pointer(this.game.input.pointer1);
+//    this.game.debug.pointer(this.game.input.pointer2);
 
     if (this.leftInputIsActive()) {
         // If the LEFT key is down, set the player velocity to move left
@@ -176,7 +178,7 @@ GameState.prototype.update = function() {
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;
-    if(onTheGround && this.jumpInputIsActive()) {
+    if(onTheGround && this.upInputIsActive()) {
         // Jump when the player is touching the ground and the up arrow is pressed
         this.player.body.velocity.y = this.JUMP_SPEED;
     }
@@ -269,14 +271,14 @@ GameState.prototype.rightInputIsActive = function() {
 // This function should return true when the player activates the "jump" control
 // In this case, either holding the up arrow or tapping or clicking on the center
 // part of the screen.
-GameState.prototype.jumpInputIsActive = function(duration) {
+GameState.prototype.upInputIsActive = function(duration) {
     var isActive = false;
 
-    isActive = this.input.keyboard.downDuration(Phaser.Keyboard.UP, duration);
-    isActive |= (this.game.input.pointer1.justPressed(duration + 1000/60) &&
+    isActive = this.input.keyboard.isDown(Phaser.Keyboard.UP);
+    isActive |= (this.game.input.pointer1.active &&
         this.game.input.pointer1.x > this.game.width/4 &&
         this.game.input.pointer1.x < this.game.width/2 + this.game.width/4);
-    isActive |= (this.game.input.pointer2.justPressed(duration + 1000/60) &&
+    isActive |= (this.game.input.pointer2.active &&
         this.game.input.pointer2.x > this.game.width/4 &&
         this.game.input.pointer2.x < this.game.width/2 + this.game.width/4);
 
@@ -287,21 +289,15 @@ GameState.prototype.downInputIsActive = function(duration) {
     var isActive = false;
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.DOWN);
-//    isActive |= (this.game.input.activePointer.isDown &&
-//        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
+//    isActive |= (this.game.input.pointer1.active &&
+//        this.game.input.pointer1.x > this.game.width/4 &&
+//        this.game.input.pointer1.x < this.game.width/2 + this.game.width/4);
+//    isActive |= (this.game.input.pointer2.active &&
+//        this.game.input.pointer2.x > this.game.width/4 &&
+//        this.game.input.pointer2.x < this.game.width/2 + this.game.width/4);
 
     return isActive;
 };
 
-GameState.prototype.upInputIsActive = function(duration) {
-    var isActive = false;
-
-    isActive = this.input.keyboard.isDown(Phaser.Keyboard.UP);
-//    isActive |= (this.game.input.activePointer.isDown &&
-//        this.game.input.activePointer.x > this.game.width/2 + this.game.width/4);
-
-    return isActive;
-};
-
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
+var game = new Phaser.Game(800, 530, Phaser.AUTO, 'game');
 game.state.add('game', GameState, true);
