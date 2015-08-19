@@ -6,7 +6,7 @@ var WORLD = {
 };
 
 var DESCRIPTIONS = {
-    start: "The adventure begins",
+    start: "The adventure begins...",
     entryway: "The Entryway",
     drawing_room: "The Drawing Room",
 }
