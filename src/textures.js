@@ -3,15 +3,18 @@ var BLOCK_SIZE = 16;
 TEXTURES = {
     wall1: { x: 4, y: 0, w: 2, h: 2 },
     brick1: { x: 4, y: 2, w: 1, h: 1 },
+    roof1: { x: 5, y: 2, w: 1, h: 1 },
+    roof2: { x: 6, y: 2, w: 1, h: 1 },
     floor1: { x: 6, y: 0, w: 2, h: 2 },
     ladder1: { x: 8, y: 0, w: 2, h: 2 },
     cannon1: { x: 10, y: 0, w: 3, h: 2 },
     cannon2: { x: 13, y: 0, w: 3, h: 2 },
     baddy1: { x: 24, y: 30, w: 2, h: 2 },
     baddy2: { x: 26, y: 30, w: 2, h: 2 },
-    kettle1: { x: 24, y: 28, w: 2, h: 2 },
-    kettle2: { x: 26, y: 28, w: 2, h: 2 },
-    ermin: { x: 30, y: 24, w: 2, h: 4 },
+    kettle1: { x: 21, y: 29, w: 3, h: 3 },
+    kettle2: { x: 18, y: 29, w: 3, h: 3 },
+    ermin: { x: 29, y: 25, w: 3, h: 3 },
+    lamp: { x: 7, y: 2, w: 3, h: 2 },
 };
 
 var PALETTE = {
@@ -49,7 +52,9 @@ var BLOCKS = [
     ["white_bright", "ermin"],
     ["yellow_bright", "baddy1"],
     ["purple", "kettle1"],
-//    ["yellow_bright", "baddy2"],
+    ["red_bright", "roof1"],
+    ["red_bright", "roof2"],
+    ["yellow_bright", "lamp"],
 ];
 
 function Textures() {

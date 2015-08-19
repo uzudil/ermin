@@ -46,7 +46,7 @@ var GameState = function(game) {
         "kettle1": {
             seq: [ "kettle1", "kettle2" ],
             move: vertical_move,
-            speed: 100,
+            speed: 200,
             gravity: false
         }
     }
@@ -58,7 +58,7 @@ GameState.prototype.preload = function() {
 };
 
 GameState.prototype.create_player = function() {
-    this.player = this.game.add.sprite(this.game.width/8, 100, 'sprites', "ermin");
+    this.player = this.game.add.sprite(this.game.width/4, 100, 'sprites', "ermin");
     this.player.tint = 0xffffff;
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 2); // x, y
