@@ -160,6 +160,9 @@ GameState.prototype.update = function() {
     this.game.physics.arcade.collide(this.enemies, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.platforms);
 
+    this.game.debug.pointer(this.game.input.pointer1);
+    this.game.debug.pointer(this.game.input.pointer2);
+
     if (this.leftInputIsActive()) {
         // If the LEFT key is down, set the player velocity to move left
         this.player.body.acceleration.x = -this.ACCELERATION;
