@@ -36,7 +36,7 @@ var GameState = function(game) {
     this.GRAVITY = 2600; // pixels/second/second
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
     this.room = "start";
-    this.CONTROLLER_SIZE = 45;
+    this.CONTROLLER_SIZE = 100;
     this.ENEMIES =  {
         "baddy1": {
             seq: [ "baddy1", "baddy2" ],
@@ -120,31 +120,8 @@ GameState.prototype.create = function() {
 
     this.CONTROLS = [ this.game.input.activePointer, this.game.input.pointer1, this.game.input.pointer2 ];
 
-    this.controls = this.game.add.group();
-    var ctrl = this.game.add.sprite(0, this.game.height - 32, 'sprites', "ctrl_right");
-    ctrl.tint = 0xff0000;
-//    ctrl.body.immovable = true;
-//    ctrl.body.allowGravity = false;
-    this.controls.add(ctrl);
-    ctrl = this.game.add.sprite(0, this.game.height - 5 - 32 * 2, 'sprites', "ctrl_left");
-    ctrl.tint = 0xff0000;
-//    ctrl.body.immovable = true;
-//    ctrl.body.allowGravity = false;
-    this.controls.add(ctrl);
-    ctrl = this.game.add.sprite(this.game.width - 32, this.game.height - 32, 'sprites', "ctrl_down");
-    ctrl.tint = 0xff0000;
-//    ctrl.body.immovable = true;
-//    ctrl.body.allowGravity = false;
-    this.controls.add(ctrl);
-    ctrl = this.game.add.sprite(this.game.width - 32, this.game.height - 5 - 32 * 2, 'sprites', "ctrl_up");
-    ctrl.tint = 0xff0000;
-//    ctrl.body.immovable = true;
-//    ctrl.body.allowGravity = false;
-    this.controls.add(ctrl);
-
-
     this.world = this.game.add.group();
-    this.world.scale.setTo((this.game.width - this.CONTROLLER_SIZE * 2)/800.0, this.game.height / 600.0);
+    this.world.scale.setTo((this.game.width - this.CONTROLLER_SIZE * 2)/800, this.game.height / 600.0);
     this.world.x = this.CONTROLLER_SIZE;
 
     this.create_player();
@@ -174,7 +151,53 @@ GameState.prototype.create = function() {
 
     this.create_room(this.room);
 
-    this.text = this.game.add.text(16, 16, "", { fontSize: '16px', fill: '#888' });
+    this.text = this.game.add.text(16 + this.world.x, 16, "", { fontSize: '16px', fill: '#888' });
+
+
+    // add the controllers
+    var graphics = this.game.add.graphics(0, 0);
+    graphics.beginFill(0x444444);
+    graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
+    graphics.endFill();
+
+    graphics.beginFill(0x4444aa);
+    graphics.drawRect(5,
+            this.game.height - this.CONTROLLER_SIZE * 2,
+            this.CONTROLLER_SIZE - 10,
+            this.CONTROLLER_SIZE - 10);
+    graphics.endFill();
+
+    graphics.beginFill(0x4444aa);
+    graphics.drawRect(5,
+            this.game.height - this.CONTROLLER_SIZE,
+            this.CONTROLLER_SIZE - 10,
+            this.CONTROLLER_SIZE - 10);
+    graphics.endFill();
+
+    graphics = this.game.add.graphics(this.game.width - this.CONTROLLER_SIZE, 0);
+    graphics.beginFill(0x444444);
+    graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
+    graphics.endFill();
+
+    graphics.beginFill(0x4444aa);
+    graphics.drawRect(5,
+            this.game.height - this.CONTROLLER_SIZE * 2,
+            this.CONTROLLER_SIZE - 10,
+            this.CONTROLLER_SIZE - 10);
+    graphics.endFill();
+
+    graphics.beginFill(0x4444aa);
+    graphics.drawRect(5,
+            this.game.height - this.CONTROLLER_SIZE,
+            this.CONTROLLER_SIZE - 10,
+            this.CONTROLLER_SIZE - 10);
+    graphics.endFill();
+
+
+    // debug
+    window.world = this.world;
+    window.game = this.game;
+    window.player = this.player;
 
 };
 
@@ -246,20 +269,21 @@ GameState.prototype.update = function() {
     // enemies collision check
 
     // screen boundary checking
+    var pw = Math.abs(this.player.width * 1.5);
     var load_room = null;
     if(this.player.x < 0 && this.player.body.velocity.x < 0) {
         load_room = WORLD[this.room][0];
         if(load_room) {
-            this.player.x += this.game.width;
+            this.player.x = this.world.width + pw;
         } else {
             this.player.x = 0;
         }
-    } else if(this.player.x >= this.game.width - this.player.width && this.player.body.velocity.x > 0) {
+    } else if(this.player.x >= this.world.width + pw && this.player.body.velocity.x > 0) {
         load_room = WORLD[this.room][1];
         if(load_room) {
-            this.player.x -= this.game.width - this.player.width;
+            this.player.x = 0;
         } else {
-            this.player.x = this.game.width - this.player.width;
+            this.player.x = this.world.width + pw;
         }
     }
     if(load_room) {
@@ -282,9 +306,9 @@ GameState.prototype.leftInputIsActive = function() {
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.LEFT);
     for(var i = 0; i < this.CONTROLS.length; i++) {
         isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
-            this.CONTROLS[i].x < 32 &&
-            this.CONTROLS[i].y >= this.game.height - 5 - 32 * 2 &&
-            this.CONTROLS[i].y < this.game.height - 32);
+            this.CONTROLS[i].x < this.CONTROLLER_SIZE &&
+            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE * 2 &&
+            this.CONTROLS[i].y < this.game.height - this.CONTROLLER_SIZE);
     }
 
     return isActive;
@@ -299,8 +323,8 @@ GameState.prototype.rightInputIsActive = function() {
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
     for(var i = 0; i < this.CONTROLS.length; i++) {
         isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
-            this.CONTROLS[i].x < 32 &&
-            this.CONTROLS[i].y >= this.game.height - 32);
+            this.CONTROLS[i].x < this.CONTROLLER_SIZE &&
+            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE);
     }
 
     return isActive;
@@ -315,9 +339,9 @@ GameState.prototype.upInputIsActive = function(duration) {
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.UP);
     for(var i = 0; i < this.CONTROLS.length; i++) {
         isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
-            this.CONTROLS[i].x >= this.game.width - 32 &&
-            this.CONTROLS[i].y >= this.game.height - 5 - 32 * 2 &&
-            this.CONTROLS[i].y < this.game.height - 32);
+            this.CONTROLS[i].x >= this.game.width - this.CONTROLLER_SIZE &&
+            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE * 2 &&
+            this.CONTROLS[i].y < this.game.height - this.CONTROLLER_SIZE);
     }
 
     return isActive;
@@ -329,12 +353,12 @@ GameState.prototype.downInputIsActive = function(duration) {
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.DOWN);
     for(var i = 0; i < this.CONTROLS.length; i++) {
         isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
-            this.CONTROLS[i].x >= this.game.width - 32 &&
-            this.CONTROLS[i].y >= this.game.height - 32);
+            this.CONTROLS[i].x >= this.game.width - this.CONTROLLER_SIZE &&
+            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE);
     }
 
     return isActive;
 };
 
-var game = new Phaser.Game(800, 530, Phaser.AUTO, 'game');
+var game = new Phaser.Game(900, 530, Phaser.AUTO, 'game');
 game.state.add('game', GameState, true);
