@@ -40,32 +40,8 @@
 	"sourceSize": {"w":48,"h":32}
 },
 {
-	"filename": "ctrl_left",
+	"filename": "pipe_up",
 	"frame": {"x":258,"y":0,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
-	"filename": "ctrl_right",
-	"frame": {"x":290,"y":0,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
-	"filename": "ctrl_down",
-	"frame": {"x":322,"y":0,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
-	"filename": "ctrl_up",
-	"frame": {"x":354,"y":0,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},

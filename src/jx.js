@@ -118,10 +118,10 @@ GameState.prototype.create = function() {
     // Set stage background to something sky colored
     this.game.stage.backgroundColor = 0x000000;
 
-    this.CONTROLS = [ this.game.input.pointer1, this.game.input.pointer2 ];
+    this.CONTROLS = [ this.game.input.activePointer, this.game.input.pointer1, this.game.input.pointer2 ];
 
     this.world = this.game.add.group();
-    this.world.scale.setTo((this.game.width - this.CONTROLLER_SIZE * 2)/800, this.game.height / 600.0);
+//    this.world.scale.setTo((this.game.width - this.CONTROLLER_SIZE * 2)/800, this.game.height / 600.0);
     this.world.x = this.CONTROLLER_SIZE;
 
     this.create_player();
@@ -153,46 +153,29 @@ GameState.prototype.create = function() {
 
     this.text = this.game.add.text(16 + this.world.x, 16, "", { fontSize: '16px', fill: '#888' });
 
-
     // add the controllers
-    var graphics = this.game.add.graphics(0, 0);
-    graphics.beginFill(0x444444);
-    graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
-    graphics.endFill();
+    var xx = [0, this.game.width - this.CONTROLLER_SIZE];
+    for(var i = 0; i < xx.length; i++) {
+        var graphics = this.game.add.graphics(xx[i], 0);
+        graphics.beginFill(0x444444);
+        graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
+        graphics.endFill();
 
-    graphics.beginFill(0x4444aa);
-    graphics.drawRect(5,
-            this.game.height - this.CONTROLLER_SIZE * 2,
-            this.CONTROLLER_SIZE - 10,
-            this.CONTROLLER_SIZE - 10);
-    graphics.endFill();
+        graphics.beginFill(0x4444aa);
+        graphics.drawCircle(this.CONTROLLER_SIZE / 2, this.game.height - this.CONTROLLER_SIZE / 2, this.CONTROLLER_SIZE - 10);
+        graphics.endFill();
+    }
 
-    graphics.beginFill(0x4444aa);
-    graphics.drawRect(5,
-            this.game.height - this.CONTROLLER_SIZE,
-            this.CONTROLLER_SIZE - 10,
-            this.CONTROLLER_SIZE - 10);
-    graphics.endFill();
-
-    graphics = this.game.add.graphics(this.game.width - this.CONTROLLER_SIZE, 0);
-    graphics.beginFill(0x444444);
-    graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
-    graphics.endFill();
-
-    graphics.beginFill(0x4444aa);
-    graphics.drawRect(5,
-            this.game.height - this.CONTROLLER_SIZE * 2,
-            this.CONTROLLER_SIZE - 10,
-            this.CONTROLLER_SIZE - 10);
-    graphics.endFill();
-
-    graphics.beginFill(0x4444aa);
-    graphics.drawRect(5,
-            this.game.height - this.CONTROLLER_SIZE,
-            this.CONTROLLER_SIZE - 10,
-            this.CONTROLLER_SIZE - 10);
-    graphics.endFill();
-
+    // controller sprite
+    var gx = this.game.add.graphics(0, 0);
+    gx.beginFill(0xffffff, 0.5);
+    gx.drawCircle(this.CONTROLLER_SIZE/2, this.CONTROLLER_SIZE/2, this.CONTROLLER_SIZE - 30);
+    gx.endFill();
+    this.controller_sprite = this.game.add.sprite(0, 0, gx.generateTexture());
+    this.controller_sprite.anchor.set(0.5);
+    this.controller_sprite2 = this.game.add.sprite(0, 0, gx.generateTexture());
+    this.controller_sprite2.anchor.set(0.5);
+    gx.destroy();
 
     // debug
     window.world = this.world;
@@ -223,10 +206,43 @@ GameState.prototype.update = function() {
 //    this.game.debug.pointer(this.game.input.pointer1);
 //    this.game.debug.pointer(this.game.input.pointer2);
 
-    if (this.leftInputIsActive()) {
+
+    var dx = 0;
+    var dy = 0;
+    var jump_active = false;
+    for(var i = 0; i < this.CONTROLS.length; i++) {
+        var c = this.CONTROLS[i];
+        if((c.active || c.isDown)) {
+            if (c.x < this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
+                dx = c.x - this.CONTROLLER_SIZE / 2;
+                dy = c.y - (this.game.height - this.CONTROLLER_SIZE / 2);
+                break;
+            }
+            if(c.x > this.game.width - this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
+                jump_active = true;
+                break;
+            }
+        }
+    }
+    if(dx != 0 || dy != 0) {
+        if(!this.controller_sprite.alive) this.controller_sprite.revive();
+        this.controller_sprite.x = this.CONTROLLER_SIZE/2 + dx;
+        this.controller_sprite.y = this.game.height - this.CONTROLLER_SIZE/2 + dy;
+    } else if(this.controller_sprite.alive) {
+        this.controller_sprite.kill();
+    }
+    if(jump_active) {
+        if(!this.controller_sprite2.alive) this.controller_sprite2.revive();
+        this.controller_sprite2.x = this.game.width - this.CONTROLLER_SIZE/2;
+        this.controller_sprite2.y = this.game.height - this.CONTROLLER_SIZE/2;
+    } else if(this.controller_sprite2.alive) {
+        this.controller_sprite2.kill();
+    }
+
+    if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT) || dx < 0) {
         // If the LEFT key is down, set the player velocity to move left
         this.player.body.acceleration.x = -this.ACCELERATION;
-    } else if (this.rightInputIsActive()) {
+    } else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || dx > 0) {
         // If the RIGHT key is down, set the player velocity to move right
         this.player.body.acceleration.x = this.ACCELERATION;
     } else {
@@ -236,21 +252,22 @@ GameState.prototype.update = function() {
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;
-    if(onTheGround && this.upInputIsActive()) {
+    if(onTheGround && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || jump_active)) {
         // Jump when the player is touching the ground and the up arrow is pressed
         this.player.body.velocity.y = this.JUMP_SPEED;
     }
 
     if (onLadder) {
-        if(this.upInputIsActive()) {
+        if(this.input.keyboard.isDown(Phaser.Keyboard.UP) || dy < 0) {
             this.player.body.acceleration.y = -this.ACCELERATION;
-        } else if(this.downInputIsActive()) {
+        } else if(this.input.keyboard.isDown(Phaser.Keyboard.DOWN) || dy > 0) {
             this.player.body.acceleration.y = this.ACCELERATION;
         } else {
             this.player.body.acceleration.y = this.player.body.velocity.y = 0;
         }
     }
 
+    // animation
     if(this.player.body.velocity.x == 0 && !this.player.animations.paused) {
         this.player.animations.paused = true;
         this.player.animations.frameName = "ermin";
@@ -258,6 +275,7 @@ GameState.prototype.update = function() {
         this.player.animations.paused = false;
     }
 
+    // directional sprite
     if(this.player.body.velocity.x != 0) {
         this.player.scale.x = this.player.body.velocity.x < 0 ? -1 : 1;
     }
@@ -269,21 +287,21 @@ GameState.prototype.update = function() {
     // enemies collision check
 
     // screen boundary checking
-    var pw = Math.abs(this.player.width * 1.5);
+    var pw = Math.abs(this.player.width);
     var load_room = null;
     if(this.player.x < 0 && this.player.body.velocity.x < 0) {
         load_room = WORLD[this.room][0];
         if(load_room) {
-            this.player.x = this.world.width + pw;
+            this.player.x = this.world.width - pw;
         } else {
             this.player.x = 0;
         }
-    } else if(this.player.x >= this.world.width + pw && this.player.body.velocity.x > 0) {
+    } else if(this.player.x >= this.world.width - pw * .6 && this.player.body.velocity.x > 0) {
         load_room = WORLD[this.room][1];
         if(load_room) {
             this.player.x = 0;
         } else {
-            this.player.x = this.world.width + pw;
+            this.player.x = this.world.width - pw;
         }
     }
     if(load_room) {
@@ -297,68 +315,5 @@ GameState.prototype.move_enemy = function(child) {
     en.move(this.game, child, en);
 };
 
-// This function should return true when the player activates the "go left" control
-// In this case, either holding the right arrow or tapping or clicking on the left
-// side of the screen.
-GameState.prototype.leftInputIsActive = function() {
-    var isActive = false;
-
-    isActive = this.input.keyboard.isDown(Phaser.Keyboard.LEFT);
-    for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= (this.CONTROLS[i].active &&
-            this.CONTROLS[i].x < this.CONTROLLER_SIZE &&
-            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE * 2 &&
-            this.CONTROLS[i].y < this.game.height - this.CONTROLLER_SIZE);
-    }
-
-    return isActive;
-};
-
-// This function should return true when the player activates the "go right" control
-// In this case, either holding the right arrow or tapping or clicking on the right
-// side of the screen.
-GameState.prototype.rightInputIsActive = function() {
-    var isActive = false;
-
-    isActive = this.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
-    for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= (this.CONTROLS[i].active &&
-            this.CONTROLS[i].x < this.CONTROLLER_SIZE &&
-            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE);
-    }
-
-    return isActive;
-};
-
-// This function should return true when the player activates the "jump" control
-// In this case, either holding the up arrow or tapping or clicking on the center
-// part of the screen.
-GameState.prototype.upInputIsActive = function(duration) {
-    var isActive = false;
-
-    isActive = this.input.keyboard.isDown(Phaser.Keyboard.UP);
-    for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= (this.CONTROLS[i].active &&
-            this.CONTROLS[i].x >= this.game.width - this.CONTROLLER_SIZE &&
-            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE * 2 &&
-            this.CONTROLS[i].y < this.game.height - this.CONTROLLER_SIZE);
-    }
-
-    return isActive;
-};
-
-GameState.prototype.downInputIsActive = function(duration) {
-    var isActive = false;
-
-    isActive = this.input.keyboard.isDown(Phaser.Keyboard.DOWN);
-    for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= (this.CONTROLS[i].active &&
-            this.CONTROLS[i].x >= this.game.width - this.CONTROLLER_SIZE &&
-            this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE);
-    }
-
-    return isActive;
-};
-
-var game = new Phaser.Game(900, 530, Phaser.AUTO, 'game');
+var game = new Phaser.Game(1000, 600, Phaser.AUTO, 'game');
 game.state.add('game', GameState, true);
