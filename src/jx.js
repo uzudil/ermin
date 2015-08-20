@@ -118,7 +118,7 @@ GameState.prototype.create = function() {
     // Set stage background to something sky colored
     this.game.stage.backgroundColor = 0x000000;
 
-    this.CONTROLS = [ this.game.input.activePointer, this.game.input.pointer1, this.game.input.pointer2 ];
+    this.CONTROLS = [ this.game.input.pointer1, this.game.input.pointer2 ];
 
     this.world = this.game.add.group();
     this.world.scale.setTo((this.game.width - this.CONTROLLER_SIZE * 2)/800, this.game.height / 600.0);
@@ -305,7 +305,7 @@ GameState.prototype.leftInputIsActive = function() {
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.LEFT);
     for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
+        isActive |= (this.CONTROLS[i].active &&
             this.CONTROLS[i].x < this.CONTROLLER_SIZE &&
             this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE * 2 &&
             this.CONTROLS[i].y < this.game.height - this.CONTROLLER_SIZE);
@@ -322,7 +322,7 @@ GameState.prototype.rightInputIsActive = function() {
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
     for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
+        isActive |= (this.CONTROLS[i].active &&
             this.CONTROLS[i].x < this.CONTROLLER_SIZE &&
             this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE);
     }
@@ -338,7 +338,7 @@ GameState.prototype.upInputIsActive = function(duration) {
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.UP);
     for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
+        isActive |= (this.CONTROLS[i].active &&
             this.CONTROLS[i].x >= this.game.width - this.CONTROLLER_SIZE &&
             this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE * 2 &&
             this.CONTROLS[i].y < this.game.height - this.CONTROLLER_SIZE);
@@ -352,7 +352,7 @@ GameState.prototype.downInputIsActive = function(duration) {
 
     isActive = this.input.keyboard.isDown(Phaser.Keyboard.DOWN);
     for(var i = 0; i < this.CONTROLS.length; i++) {
-        isActive |= ((this.CONTROLS[i].active || this.CONTROLS[i].isDown) &&
+        isActive |= (this.CONTROLS[i].active &&
             this.CONTROLS[i].x >= this.game.width - this.CONTROLLER_SIZE &&
             this.CONTROLS[i].y >= this.game.height - this.CONTROLLER_SIZE);
     }
