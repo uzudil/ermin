@@ -216,11 +216,9 @@ GameState.prototype.update = function() {
             if (c.x < this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
                 dx = c.x - this.CONTROLLER_SIZE / 2;
                 dy = c.y - (this.game.height - this.CONTROLLER_SIZE / 2);
-                break;
             }
             if(c.x > this.game.width - this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
                 jump_active = true;
-                break;
             }
         }
     }
