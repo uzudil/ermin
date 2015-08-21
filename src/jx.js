@@ -191,6 +191,7 @@ GameState.prototype.create = function() {
 GameState.prototype.update = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
     this.player.body.allowGravity = !onLadder;
+    this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
 
     this.text.text = DESCRIPTIONS[this.room];
     this.player.rotation = onLadder ? 0 :
@@ -229,6 +230,13 @@ GameState.prototype.update = function() {
         if(!this.controller_sprite.alive) this.controller_sprite.revive();
         this.controller_sprite.x = this.CONTROLLER_SIZE/2 + dx;
         this.controller_sprite.y = this.game.height - this.CONTROLLER_SIZE/2 + dy;
+
+        var angle = Math.atan2(dx, dy) * 180/Math.PI;
+//        this.text.text = "" + angle.toFixed(2);
+        // lock to up/down only
+        if(onLadder && (Math.abs(angle) < 60 || Math.abs(angle) >= 130)) {
+            dx = 0;
+        }
     } else if(this.controller_sprite.alive) {
         this.controller_sprite.kill();
     }
@@ -253,12 +261,10 @@ GameState.prototype.update = function() {
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;
-    if(onTheGround && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || jump_active)) {
+    if((onTheGround || onLadder) && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || jump_active)) {
         // Jump when the player is touching the ground and the up arrow is pressed
         this.player.body.velocity.y = this.JUMP_SPEED;
-    }
-
-    if (onLadder) {
+    } else if (onLadder) {
         if(this.input.keyboard.isDown(Phaser.Keyboard.UP) || dy < 0) {
             this.player.body.acceleration.y = -this.ACCELERATION;
         } else if(this.input.keyboard.isDown(Phaser.Keyboard.DOWN) || dy > 0) {
