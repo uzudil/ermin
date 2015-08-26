@@ -36,7 +36,7 @@ var GameState = function(game) {
     this.GRAVITY = 2600; // pixels/second/second
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
     this.room = "start";
-    this.CONTROLLER_SIZE = 100;
+    this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
     this.ENEMIES =  {
         "baddy1": {
             seq: [ "baddy1", "baddy2" ],
@@ -57,6 +57,8 @@ var GameState = function(game) {
 GameState.prototype.preload = function() {
     this.game.load.atlas('sprites', 'data/tex.png', 'data/tex.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
 
+    this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
+    this.CONTROLLER_SIZE = 100;
     this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.game.scale.pageAlignVertically = true;
 };
@@ -117,6 +119,34 @@ GameState.prototype.create_room = function(name) {
     }
 };
 
+GameState.prototype.create_mobile_controller = function() {
+    if(this.CONTROLLER_SIZE > 0) {
+        // add the controllers
+        var xx = [0, this.game.width - this.CONTROLLER_SIZE];
+        for (var i = 0; i < xx.length; i++) {
+            var graphics = this.game.add.graphics(xx[i], 0);
+            graphics.beginFill(0x444444);
+            graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
+            graphics.endFill();
+
+            graphics.beginFill(0x4444aa);
+            graphics.drawCircle(this.CONTROLLER_SIZE / 2, this.game.height - this.CONTROLLER_SIZE / 2, this.CONTROLLER_SIZE - 10);
+            graphics.endFill();
+        }
+
+        // controller sprite
+        var gx = this.game.add.graphics(0, 0);
+        gx.beginFill(0xffffff, 0.5);
+        gx.drawCircle(this.CONTROLLER_SIZE / 2, this.CONTROLLER_SIZE / 2, this.CONTROLLER_SIZE - 30);
+        gx.endFill();
+        this.controller_sprite = this.game.add.sprite(0, 0, gx.generateTexture());
+        this.controller_sprite.anchor.set(0.5);
+        this.controller_sprite2 = this.game.add.sprite(0, 0, gx.generateTexture());
+        this.controller_sprite2.anchor.set(0.5);
+        gx.destroy();
+    }
+};
+
 GameState.prototype.create = function() {
     // Set stage background to something sky colored
     this.game.stage.backgroundColor = 0x000000;
@@ -124,8 +154,8 @@ GameState.prototype.create = function() {
     this.CONTROLS = [ this.game.input.activePointer, this.game.input.pointer1, this.game.input.pointer2 ];
 
     this.world = this.game.add.group();
-//    this.world.scale.setTo((this.game.width - this.CONTROLLER_SIZE * 2)/800, this.game.height / 600.0);
-    this.world.x = this.CONTROLLER_SIZE;
+    this.world.scale.x = (this.game.width - 2 * this.CONTROLLER_SIZE) / this.game.width;
+    this.world.position.x = this.CONTROLLER_SIZE;
 
     this.create_player();
     this.world.add(this.player);
@@ -156,35 +186,61 @@ GameState.prototype.create = function() {
 
     this.text = this.game.add.text(16 + this.world.x, 16, "", { fontSize: '16px', fill: '#888' });
 
-    // add the controllers
-    var xx = [0, this.game.width - this.CONTROLLER_SIZE];
-    for(var i = 0; i < xx.length; i++) {
-        var graphics = this.game.add.graphics(xx[i], 0);
-        graphics.beginFill(0x444444);
-        graphics.drawRect(0, 0, this.CONTROLLER_SIZE, this.game.height);
-        graphics.endFill();
-
-        graphics.beginFill(0x4444aa);
-        graphics.drawCircle(this.CONTROLLER_SIZE / 2, this.game.height - this.CONTROLLER_SIZE / 2, this.CONTROLLER_SIZE - 10);
-        graphics.endFill();
-    }
-
-    // controller sprite
-    var gx = this.game.add.graphics(0, 0);
-    gx.beginFill(0xffffff, 0.5);
-    gx.drawCircle(this.CONTROLLER_SIZE/2, this.CONTROLLER_SIZE/2, this.CONTROLLER_SIZE - 30);
-    gx.endFill();
-    this.controller_sprite = this.game.add.sprite(0, 0, gx.generateTexture());
-    this.controller_sprite.anchor.set(0.5);
-    this.controller_sprite2 = this.game.add.sprite(0, 0, gx.generateTexture());
-    this.controller_sprite2.anchor.set(0.5);
-    gx.destroy();
+    this.create_mobile_controller();
 
     // debug
     window.world = this.world;
     window.game = this.game;
     window.player = this.player;
 
+};
+
+GameState.prototype.get_mobile_controller_position = function(onLadder) {
+//    this.game.debug.pointer(this.game.input.activePointer);
+//    this.game.debug.pointer(this.game.input.pointer1);
+//    this.game.debug.pointer(this.game.input.pointer2);
+
+    var dx = 0;
+    var dy = 0;
+    var jump_active = false;
+    if(this.CONTROLLER_SIZE > 0) {
+        for (var i = 0; i < this.CONTROLS.length; i++) {
+            var c = this.CONTROLS[i];
+            if ((c.active || c.isDown)) {
+                if (c.x < this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
+                    dx = c.x - this.CONTROLLER_SIZE / 2;
+                    dy = c.y - (this.game.height - this.CONTROLLER_SIZE / 2);
+                }
+                if (c.x > this.game.width - this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
+                    jump_active = true;
+                }
+            }
+        }
+        if (dx != 0 || dy != 0) {
+            if (!this.controller_sprite.alive) this.controller_sprite.revive();
+            this.controller_sprite.x = this.CONTROLLER_SIZE / 2 + dx;
+            this.controller_sprite.y = this.game.height - this.CONTROLLER_SIZE / 2 + dy;
+
+            var angle = Math.atan2(dx, dy) * 180 / Math.PI;
+//        this.text.text = "" + angle.toFixed(2);
+            // lock to up/down only
+            if (onLadder && (Math.abs(angle) < 60 || Math.abs(angle) >= 130)) {
+                dx = 0;
+            }
+        } else if (this.controller_sprite.alive) {
+            this.controller_sprite.kill();
+        }
+        if (jump_active) {
+            if (!this.controller_sprite2.alive) this.controller_sprite2.revive();
+            this.controller_sprite2.x = this.game.width - this.CONTROLLER_SIZE / 2;
+            this.controller_sprite2.y = this.game.height - this.CONTROLLER_SIZE / 2;
+        } else if (this.controller_sprite2.alive) {
+            this.controller_sprite2.kill();
+        }
+    }
+    this.mobile_controller_pos.dx = dx;
+    this.mobile_controller_pos.dy = dy;
+    this.mobile_controller_pos.jump_active = jump_active;
 };
 
 // The update() method is called every frame
@@ -206,52 +262,12 @@ GameState.prototype.update = function() {
     this.game.physics.arcade.collide(this.enemies, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.platforms);
 
-//    this.game.debug.pointer(this.game.input.activePointer);
-//    this.game.debug.pointer(this.game.input.pointer1);
-//    this.game.debug.pointer(this.game.input.pointer2);
+    this.get_mobile_controller_position(onLadder);
 
-
-    var dx = 0;
-    var dy = 0;
-    var jump_active = false;
-    for(var i = 0; i < this.CONTROLS.length; i++) {
-        var c = this.CONTROLS[i];
-        if((c.active || c.isDown)) {
-            if (c.x < this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
-                dx = c.x - this.CONTROLLER_SIZE / 2;
-                dy = c.y - (this.game.height - this.CONTROLLER_SIZE / 2);
-            }
-            if(c.x > this.game.width - this.CONTROLLER_SIZE && c.y > this.game.height - this.CONTROLLER_SIZE) {
-                jump_active = true;
-            }
-        }
-    }
-    if(dx != 0 || dy != 0) {
-        if(!this.controller_sprite.alive) this.controller_sprite.revive();
-        this.controller_sprite.x = this.CONTROLLER_SIZE/2 + dx;
-        this.controller_sprite.y = this.game.height - this.CONTROLLER_SIZE/2 + dy;
-
-        var angle = Math.atan2(dx, dy) * 180/Math.PI;
-//        this.text.text = "" + angle.toFixed(2);
-        // lock to up/down only
-        if(onLadder && (Math.abs(angle) < 60 || Math.abs(angle) >= 130)) {
-            dx = 0;
-        }
-    } else if(this.controller_sprite.alive) {
-        this.controller_sprite.kill();
-    }
-    if(jump_active) {
-        if(!this.controller_sprite2.alive) this.controller_sprite2.revive();
-        this.controller_sprite2.x = this.game.width - this.CONTROLLER_SIZE/2;
-        this.controller_sprite2.y = this.game.height - this.CONTROLLER_SIZE/2;
-    } else if(this.controller_sprite2.alive) {
-        this.controller_sprite2.kill();
-    }
-
-    if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT) || dx < 0) {
+    if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT) || this.mobile_controller_pos.dx < 0) {
         // If the LEFT key is down, set the player velocity to move left
         this.player.body.acceleration.x = -this.ACCELERATION;
-    } else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || dx > 0) {
+    } else if (this.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || this.mobile_controller_pos.dx > 0) {
         // If the RIGHT key is down, set the player velocity to move right
         this.player.body.acceleration.x = this.ACCELERATION;
     } else {
@@ -261,13 +277,13 @@ GameState.prototype.update = function() {
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;
-    if((onTheGround || onLadder) && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || jump_active)) {
+    if((onTheGround || onLadder) && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || this.mobile_controller_pos.jump_active)) {
         // Jump when the player is touching the ground and the up arrow is pressed
         this.player.body.velocity.y = this.JUMP_SPEED;
     } else if (onLadder) {
-        if(this.input.keyboard.isDown(Phaser.Keyboard.UP) || dy < 0) {
+        if(this.input.keyboard.isDown(Phaser.Keyboard.UP) || this.mobile_controller_pos.dy < 0) {
             this.player.body.acceleration.y = -this.ACCELERATION;
-        } else if(this.input.keyboard.isDown(Phaser.Keyboard.DOWN) || dy > 0) {
+        } else if(this.input.keyboard.isDown(Phaser.Keyboard.DOWN) || this.mobile_controller_pos.dy > 0) {
             this.player.body.acceleration.y = this.ACCELERATION;
         } else {
             this.player.body.acceleration.y = this.player.body.velocity.y = 0;
@@ -299,16 +315,16 @@ GameState.prototype.update = function() {
     if(this.player.x < 0 && this.player.body.velocity.x < 0) {
         load_room = WORLD[this.room][0];
         if(load_room) {
-            this.player.x = this.world.width - pw;
+            this.player.x = this.game.width - pw;
         } else {
             this.player.x = 0;
         }
-    } else if(this.player.x >= this.world.width - pw * .6 && this.player.body.velocity.x > 0) {
+    } else if(this.player.x >= this.game.width - pw * .6 && this.player.body.velocity.x > 0) {
         load_room = WORLD[this.room][1];
         if(load_room) {
             this.player.x = 0;
         } else {
-            this.player.x = this.world.width - pw;
+            this.player.x = this.game.width - pw;
         }
     }
     if(load_room) {
@@ -322,5 +338,5 @@ GameState.prototype.move_enemy = function(child) {
     en.move(this.game, child, en);
 };
 
-var game = new Phaser.Game(1000, 600, Phaser.AUTO, 'game');
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
 game.state.add('game', GameState, true);
