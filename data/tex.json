@@ -73,7 +73,7 @@
 },
 {
 	"filename": "lamp",
-	"frame": {"x":110,"y":32,"w":48,"h":32},
+	"frame": {"x":112,"y":32,"w":48,"h":32},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":32},
