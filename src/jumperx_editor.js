@@ -2,6 +2,9 @@ var WIDTH = 50 * BLOCK_SIZE;
 var HEIGHT = 38 * BLOCK_SIZE;
 
 function JumperXEditor() {
+    // do not cache any ajax calls EVAR!!1!
+    $.ajaxSetup({ cache: false });
+
 //    init_gl(bind(this, this.game_step));
 
 //    var box = new THREE.BoxGeometry(350, 350, 350);

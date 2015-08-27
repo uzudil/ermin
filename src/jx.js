@@ -3,6 +3,21 @@
 // Copyright © 2014 John Watson
 // Licensed under the terms of the MIT License
 
+EXTRA_INFO = {
+    "wall2": {
+        jump_thru: false
+    },
+    "brick1": {
+        jump_thru: false
+    },
+    "brick2": {
+        jump_thru: true
+    },
+    "ladder1": {
+        ladder: true
+    }
+};
+
 function horizontal_move(game, sprite, enemy) {
     if(sprite.body.velocity.x == 0) sprite.body.velocity.x = enemy.speed;
     var to_left = sprite.body.velocity.x < 0;
@@ -37,7 +52,9 @@ var GameState = function(game) {
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
     this.room = "start";
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
+    this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
     this.ENEMIES =  {
+        // key is the name of the shape in the room definition
         "baddy1": {
             seq: [ "baddy1", "baddy2" ],
             move: horizontal_move,
@@ -55,10 +72,9 @@ var GameState = function(game) {
 
 // Load images and sounds
 GameState.prototype.preload = function() {
-    this.game.load.atlas('sprites', 'data/tex.png', 'data/tex.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+    this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
 
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
-    this.CONTROLLER_SIZE = 100;
     this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.game.scale.pageAlignVertically = true;
 };
@@ -66,6 +82,8 @@ GameState.prototype.preload = function() {
 GameState.prototype.create_player = function() {
     this.player = this.game.add.sprite(this.game.width/4, 100, 'sprites', "ermin");
     this.player.tint = 0xffffff;
+    this.player.scale.x = this.PLAYER_SCALE;
+    this.player.scale.y = this.PLAYER_SCALE;
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 2); // x, y
     this.player.body.drag.setTo(this.DRAG, 0); // x, y
@@ -104,14 +122,13 @@ GameState.prototype.create_room = function(name) {
                 var block = BLOCKS[room[x][y]];
                 var color = PALETTE[block[0]][0];
                 var group;
-                if(y >= 538) {
-                    group = this.ground;
-                } else if(block[1] == "ladder1") {
-                    group = this.ladders;
-                } else if(block[1] in this.ENEMIES) {
+                var ex = EXTRA_INFO[block[1]];
+                if(block[1] in this.ENEMIES) {
                     group = this.enemies;
+                } else if(ex && ex.ladder) {
+                    group = this.ladders;
                 } else {
-                    group = this.platforms;
+                    group = !ex || ex.jump_thru ? this.platforms : this.ground;
                 }
                 this.create_block(x * 16, y * 16, block[1], group, color);
             }
@@ -255,7 +272,7 @@ GameState.prototype.update = function() {
         this.player.body.velocity.y * 0.001;
 
     // Collide the player with the ground
-    if (!onLadder) {
+    if (!onLadder && player.body.velocity.y > 0) {
         this.game.physics.arcade.collide(this.player, this.platforms);
     }
     this.game.physics.arcade.collide(this.player, this.ground);
@@ -300,7 +317,7 @@ GameState.prototype.update = function() {
 
     // directional sprite
     if(this.player.body.velocity.x != 0) {
-        this.player.scale.x = this.player.body.velocity.x < 0 ? -1 : 1;
+        this.player.scale.x = this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE;
     }
 
 

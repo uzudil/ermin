@@ -41,6 +41,12 @@ var BLOCKS = [
     ["red_bright", "roof2"],
     ["yellow_bright", "lamp"],
     ["yellow", "pipe_up"],
+    ["red", "wall2"],
+    ["blue", "wall2"],
+    ["green", "wall2"],
+    ["red", "brick2"],
+    ["blue", "brick2"],
+    ["green", "brick2"],
 ];
 
 function Textures() {
@@ -72,7 +78,7 @@ Textures.prototype.load = function(on_complete) {
                 this.tex_loaded(x, blender, tex_img);
                 on_complete();
             });
-            tex_img.src = "data/tex.png";
+            tex_img.src = "data/tex.png?cb=" + Date.now();
         })
     });
 };
