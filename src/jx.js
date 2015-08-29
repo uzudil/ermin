@@ -15,6 +15,15 @@ EXTRA_INFO = {
     },
     "ladder1": {
         ladder: true
+    },
+    "door_open": {
+        door: true
+    },
+    "door_closed": {
+        door: true
+    },
+    "key": {
+        pickup: true
     }
 };
 
@@ -67,7 +76,8 @@ var GameState = function(game) {
             speed: 200,
             gravity: false
         }
-    }
+    };
+    this.player_keys = {};
 };
 
 // Load images and sounds
@@ -80,7 +90,7 @@ GameState.prototype.preload = function() {
 };
 
 GameState.prototype.create_player = function() {
-    this.player = this.game.add.sprite(this.game.width/4, 100, 'sprites', "ermin");
+    this.player = this.game.add.sprite(this.game.width/4, 300, 'sprites', "ermin");
     this.player.tint = 0xffffff;
     this.player.scale.x = this.PLAYER_SCALE;
     this.player.scale.y = this.PLAYER_SCALE;
@@ -114,7 +124,10 @@ GameState.prototype.create_room = function(name) {
     this.platforms.removeAll();
     this.ladders.removeAll();
     this.enemies.removeAll();
+    this.doors.removeAll();
+    this.pickups.removeAll();
 
+    var stored_room = this.getStoredRoom();
     var room = ROOMS[name];
     for(var x = 0; x < room.length; x++) {
         for(var y = 0; y < room[x].length; y++) {
@@ -127,6 +140,29 @@ GameState.prototype.create_room = function(name) {
                     group = this.enemies;
                 } else if(ex && ex.ladder) {
                     group = this.ladders;
+                } else if(ex && ex.pickup) {
+                    group = this.pickups;
+                    var f = false;
+                    for(var i = 0; i < stored_room["pickups"].length; i++) {
+                        var pos = stored_room["pickups"][i];
+                        if(pos[0] == x * 16 && pos[1] == y * 16) {
+                            f = true;
+                            break;
+                        }
+                    }
+                    if(f) continue;
+                } else if(ex && ex.door) {
+                    group = this.doors;
+                    // open previously opened doors
+                    if(block[1] == "door_closed") {
+                        for(var i = 0; i < stored_room["open_doors"].length; i++) {
+                            var pos = stored_room["open_doors"][i];
+                            if(pos[0] == x * 16 && pos[1] == y * 16) {
+                                block[1] = "door_open";
+                                break;
+                            }
+                        }
+                    }
                 } else {
                     group = !ex || ex.jump_thru ? this.platforms : this.ground;
                 }
@@ -194,10 +230,14 @@ GameState.prototype.create = function() {
     this.platforms = this.game.add.group();
     this.ladders = this.game.add.group();
     this.enemies = this.game.add.group();
+    this.doors = this.game.add.group();
+    this.pickups = this.game.add.group();
     this.world.add(this.ground);
     this.world.add(this.platforms);
     this.world.add(this.ladders);
     this.world.add(this.enemies);
+    this.world.add(this.doors);
+    this.world.add(this.pickups);
 
     this.create_room(this.room);
 
@@ -210,7 +250,30 @@ GameState.prototype.create = function() {
     window.game = this.game;
     window.player = this.player;
 
+    // music
+//    MIDI.loadPlugin({
+//		soundfontUrl: "../lib/soundfont/",
+//		instrument: "vibraphone",
+//		onprogress: function(state, progress) {
+//			console.log(state, progress);
+//		},
+//		onsuccess: function() {
+//            var player = MIDI.Player;
+//            player.loadFile("../data/ermin2.mid", player.start);
+//            player.addListener(function(data) { // set it to your own function!
+////                console.log("now=" + data.now + " end="+ data.end + " playing=" + MIDI.Player.playing);
+//
+//                if (data.now >= data.end) {
+//                    setTimeout(function() {
+//                        player.stop();
+//                        player.start();
+//                    }, 2500);
+//                }
+//            });
+//		}
+//	});
 };
+
 
 GameState.prototype.get_mobile_controller_position = function(onLadder) {
 //    this.game.debug.pointer(this.game.input.activePointer);
@@ -261,6 +324,54 @@ GameState.prototype.get_mobile_controller_position = function(onLadder) {
 };
 
 // The update() method is called every frame
+GameState.prototype.pickupOverlap = function(player, pickup) {
+    if(pickup.frameName == "key") {
+        this.pickups.remove(pickup);
+        if(pickup.tint in this.player_keys) {
+            this.player_keys[pickup.tint] = this.player_keys[pickup.tint] + 1;
+        } else {
+            this.player_keys[pickup.tint] = 1;
+        }
+        var stored_room = this.getStoredRoom();
+        stored_room.pickups.push([pickup.x, pickup.y]);
+        localStorage[this.room] = JSON.stringify(stored_room);
+    }
+};
+
+GameState.prototype.doorOverlap = function(player, door) {
+//    console.log("overlap between " + player.frameName + " and " + door.frameName);
+    if(door.frameName == "door_closed") {
+
+        var key_count = this.player_keys[door.tint] || 0;
+        if(key_count > 0) {
+            this.player_keys[door.tint] = this.player_keys[door.tint] - 1;
+
+            this.doors.remove(door);
+            this.create_block(door.x, door.y, "door_open", this.doors, door.tint);
+
+            // store this opened door
+            var stored_room = this.getStoredRoom();
+            stored_room.open_doors.push([door.x, door.y]);
+            localStorage[this.room] = JSON.stringify(stored_room);
+        } else {
+            this.game.physics.arcade.collide(player, door);
+        }
+    }
+};
+
+GameState.prototype.getStoredRoom = function() {
+    var stored_room;
+    if(this.room in localStorage) {
+        stored_room = JSON.parse(localStorage[this.room]);
+    } else {
+        stored_room = {
+            "open_doors": [],
+            "pickups": []
+        };
+    }
+    return stored_room;
+};
+
 GameState.prototype.update = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
     this.player.body.allowGravity = !onLadder;
@@ -278,6 +389,10 @@ GameState.prototype.update = function() {
     this.game.physics.arcade.collide(this.player, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.platforms);
+    this.game.physics.arcade.collide(this.enemies, this.doors);
+
+    this.game.physics.arcade.overlap(this.player, this.doors.children, this.doorOverlap, null, this);
+    this.game.physics.arcade.overlap(this.player, this.pickups.children, this.pickupOverlap, null, this);
 
     this.get_mobile_controller_position(onLadder);
 

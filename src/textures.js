@@ -47,6 +47,27 @@ var BLOCKS = [
     ["red", "brick2"],
     ["blue", "brick2"],
     ["green", "brick2"],
+    ["red", "floor2"],
+    ["blue", "floor2"],
+    ["green", "floor2"],
+    ["red", "floor3"],
+    ["blue", "floor3"],
+    ["green", "floor3"],
+    ["white", "door_closed"],
+    ["white", "key"],
+    ["yellow", "door_closed"],
+    ["yellow", "key"],
+    ["red", "door_closed"],
+    ["red", "key"],
+    ["green", "door_closed"],
+    ["green", "key"],
+    ["blue", "door_closed"],
+    ["blue", "key"],
+    ["purple", "door_closed"],
+    ["purple", "key"],
+    ["turquoise", "door_closed"],
+    ["turquoise", "key"],
+
 ];
 
 function Textures() {
