@@ -73,6 +73,9 @@ var BLOCKS = [
     ["red", "ledge_left"], 
     ["yellow_bright", "coin"],
     ["green", "spike1"],
+    ["blue", "book1"],
+    ["blue", "book2"],
+    ["white", "window"],
 ];
 
 function Textures() {

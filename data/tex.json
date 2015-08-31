@@ -8,6 +8,14 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
+	"filename": "window",
+	"frame": {"x":0,"y":64,"w":32,"h":48},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":48},
+	"sourceSize": {"w":32,"h":48}
+},
+{
 	"filename": "floor1",
 	"frame": {"x":96,"y":0,"w":16,"h":16},
 	"rotated": false,
@@ -78,6 +86,22 @@
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
 	"sourceSize": {"w":16,"h":16}
+},
+{
+	"filename": "book1",
+	"frame": {"x":336,"y":0,"w":48,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":16},
+	"sourceSize": {"w":48,"h":16}
+},
+{
+	"filename": "book2",
+	"frame": {"x":336,"y":16,"w":48,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":16},
+	"sourceSize": {"w":48,"h":16}
 },
 {
 	"filename": "brick1",
