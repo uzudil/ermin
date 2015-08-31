@@ -3,6 +3,13 @@
 // Copyright © 2014 John Watson
 // Licensed under the terms of the MIT License
 
+bind = function(callerObj, method) {
+    var f = function() {
+        return method.apply(callerObj, arguments);
+    };
+    return f;
+};
+
 EXTRA_INFO = {
     "wall2": {
         jump_thru: false
@@ -24,33 +31,58 @@ EXTRA_INFO = {
     },
     "key": {
         pickup: true
+    },
+    "coin": {
+        pickup:  true
+    },
+    "ledge_right": {
+        jump_thru:  true
+    },
+    "ledge_left": {
+        jump_thru:  true
     }
 };
 
-function horizontal_move(game, sprite, enemy) {
+var spike_move = function(game_state, sprite, enemy) {
+    var n = Date.now();
+    if(!sprite["timer"] || n > sprite["timer"]) {
+        if(sprite["on"]) {
+            sprite.position.y += 16;
+            sprite["on"] = false;        
+        } else  {
+            sprite.position.y -= 16;
+            sprite["on"] = true;
+        }
+        var t = ((((Math.random() * 5) + 1)|0) * 500);
+        sprite["timer"] = n + t;
+    }
+
+};
+
+var horizontal_move = function(game_state, sprite, enemy) {
     if(sprite.body.velocity.x == 0) sprite.body.velocity.x = enemy.speed;
     var to_left = sprite.body.velocity.x < 0;
     var flip = !sprite.body.touching.down ||
         (sprite.body.touching.left && to_left) ||
         (sprite.body.touching.right && !to_left) ||
         (sprite.x <= 0 && to_left) ||
-        (sprite.x >= game.width - sprite.width && !to_left);
+        (sprite.x >= game_state.game.width - sprite.width && !to_left);
     if (flip) {
         sprite.body.velocity.x *= -1;
     }
-}
+};
 
-function vertical_move(game, sprite, enemy) {
+var vertical_move = function(game_state, sprite, enemy) {
     if(sprite.body.velocity.y == 0) sprite.body.velocity.y = enemy.speed;
     var to_up = sprite.body.velocity.y < 0;
     var flip = (sprite.body.touching.up && to_up) ||
         (sprite.body.touching.down && !to_up) ||
         (sprite.y <= 0 && to_up) ||
-        (sprite.y >= game.height - sprite.height && !to_up);
+        (sprite.y >= game_state.game.height - sprite.height && !to_up);
     if (flip) {
         sprite.body.velocity.y *= -1;
     }
-}
+};
 
 var GameState = function(game) {
     // Define movement constants
@@ -75,7 +107,23 @@ var GameState = function(game) {
             move: vertical_move,
             speed: 200,
             gravity: false
-        }
+        },
+        "ameba1": {
+            seq: [ "ameba1", "ameba2" ],
+            move: vertical_move,
+            speed: 100,
+            gravity: false
+        },
+        "ameba2": {
+            seq: [ "ameba1", "ameba2" ],
+            move: horizontal_move,
+            speed: 100,
+            gravity: true
+        },
+        "spike1": {
+            seq: [],
+            move: spike_move
+        },
     };
     this.player_keys = {};
 };
@@ -109,8 +157,10 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
     block.start_key = name;
     this.game.physics.enable(block, Phaser.Physics.ARCADE);
     if(group == this.enemies) {
-        block.animations.add("walk", this.ENEMIES[name].seq, 10, true, false);
-        block.animations.play("walk");
+        if(this.ENEMIES[name].seq.length > 0) {
+            block.animations.add("walk", this.ENEMIES[name].seq, 10, true, false);
+            block.animations.play("walk");
+        }
         block.body.allowGravity = this.ENEMIES[name].gravity;
     } else {
         block.body.immovable = true;
@@ -126,7 +176,6 @@ GameState.prototype.create_room = function(name) {
     this.enemies.removeAll();
     this.doors.removeAll();
     this.pickups.removeAll();
-    this.decor.removeAll();
 
     var stored_room = this.getStoredRoom();
     var room = ROOMS[name];
@@ -141,8 +190,6 @@ GameState.prototype.create_room = function(name) {
                     group = this.enemies;
                 } else if(ex && ex.ladder) {
                     group = this.ladders;
-                } else if(ex && ex.decor) {
-                    group = this.decor;
                 } else if(ex && ex.pickup) {
                     group = this.pickups;
                     var f = false;
@@ -235,14 +282,12 @@ GameState.prototype.create = function() {
     this.enemies = this.game.add.group();
     this.doors = this.game.add.group();
     this.pickups = this.game.add.group();
-    this.decor = this.game.add.group();
     this.world.add(this.ground);
     this.world.add(this.platforms);
     this.world.add(this.ladders);
     this.world.add(this.enemies);
     this.world.add(this.doors);
     this.world.add(this.pickups);
-    this.world.add(this.decor);
 
     this.create_room(this.room);
 
@@ -377,6 +422,11 @@ GameState.prototype.getStoredRoom = function() {
     return stored_room;
 };
 
+GameState.prototype.move_enemy = function(child) {
+    var en = this.ENEMIES[child.start_key];
+    en.move(this, child, en);
+};
+
 GameState.prototype.update = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
     this.player.body.allowGravity = !onLadder;
@@ -468,11 +518,6 @@ GameState.prototype.update = function() {
         this.room = load_room;
         this.create_room(this.room);
     }
-};
-
-GameState.prototype.move_enemy = function(child) {
-    var en = this.ENEMIES[child.start_key];
-    en.move(this.game, child, en);
 };
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
