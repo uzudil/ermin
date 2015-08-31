@@ -2,6 +2,9 @@ var WIDTH = 50 * BLOCK_SIZE;
 var HEIGHT = 38 * BLOCK_SIZE;
 
 function JumperXEditor() {
+    // do not cache any ajax calls EVAR!!1!
+    $.ajaxSetup({ cache: false });
+
 //    init_gl(bind(this, this.game_step));
 
 //    var box = new THREE.BoxGeometry(350, 350, 350);
@@ -77,11 +80,11 @@ JumperXEditor.prototype.keydown = function(event) {
         switch(event.which) {
             case 39: // right
                 this.crsr_x += step_x;
-                if(this.crsr_x >= ((WIDTH/BLOCK_SIZE)|0) - 1) this.crsr_x -= step_x;
+                if(this.crsr_x >= ((WIDTH/BLOCK_SIZE)|0)) this.crsr_x -= step_x;
                 break;
             case 40: // down
                 this.crsr_y += step_y;
-                if(this.crsr_y >= ((HEIGHT/BLOCK_SIZE)|0) - 1) this.crsr_y -= step_y;
+                if(this.crsr_y >= ((HEIGHT/BLOCK_SIZE)|0)) this.crsr_y -= step_y;
                 break;
             case 37: // left
                 this.crsr_x -= step_x;
