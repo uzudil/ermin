@@ -126,6 +126,7 @@ GameState.prototype.create_room = function(name) {
     this.enemies.removeAll();
     this.doors.removeAll();
     this.pickups.removeAll();
+    this.decor.removeAll();
 
     var stored_room = this.getStoredRoom();
     var room = ROOMS[name];
@@ -140,6 +141,8 @@ GameState.prototype.create_room = function(name) {
                     group = this.enemies;
                 } else if(ex && ex.ladder) {
                     group = this.ladders;
+                } else if(ex && ex.decor) {
+                    group = this.decor;
                 } else if(ex && ex.pickup) {
                     group = this.pickups;
                     var f = false;
@@ -232,12 +235,14 @@ GameState.prototype.create = function() {
     this.enemies = this.game.add.group();
     this.doors = this.game.add.group();
     this.pickups = this.game.add.group();
+    this.decor = this.game.add.group();
     this.world.add(this.ground);
     this.world.add(this.platforms);
     this.world.add(this.ladders);
     this.world.add(this.enemies);
     this.world.add(this.doors);
     this.world.add(this.pickups);
+    this.world.add(this.decor);
 
     this.create_room(this.room);
 
