@@ -1,21 +1,6 @@
 var BLOCK_SIZE = 16;
 
-TEXTURES = {
-    wall1: { x: 4, y: 0, w: 2, h: 2 },
-    brick1: { x: 4, y: 2, w: 1, h: 1 },
-    roof1: { x: 5, y: 2, w: 1, h: 1 },
-    roof2: { x: 6, y: 2, w: 1, h: 1 },
-    floor1: { x: 6, y: 0, w: 2, h: 2 },
-    ladder1: { x: 8, y: 0, w: 2, h: 2 },
-    cannon1: { x: 10, y: 0, w: 3, h: 2 },
-    cannon2: { x: 13, y: 0, w: 3, h: 2 },
-    baddy1: { x: 24, y: 30, w: 2, h: 2 },
-    baddy2: { x: 26, y: 30, w: 2, h: 2 },
-    kettle1: { x: 21, y: 29, w: 3, h: 3 },
-    kettle2: { x: 18, y: 29, w: 3, h: 3 },
-    ermin: { x: 29, y: 25, w: 3, h: 3 },
-    lamp: { x: 7, y: 2, w: 3, h: 2 },
-};
+var TEXTURES = {}; // will be filled in from tex.json
 
 var PALETTE = {
     black:              [0x000000, 0, 0],
@@ -55,6 +40,39 @@ var BLOCKS = [
     ["red_bright", "roof1"],
     ["red_bright", "roof2"],
     ["yellow_bright", "lamp"],
+    ["yellow", "pipe_up"],
+    ["red", "wall2"],
+    ["blue", "wall2"],
+    ["green", "wall2"],
+    ["red", "brick2"],
+    ["blue", "brick2"],
+    ["green", "brick2"],
+    ["red", "floor2"],
+    ["blue", "floor2"],
+    ["green", "floor2"],
+    ["red", "floor3"],
+    ["blue", "floor3"],
+    ["green", "floor3"],
+    ["white", "door_closed"],
+    ["white", "key"],
+    ["yellow", "door_closed"],
+    ["yellow", "key"],
+    ["red", "door_closed"],
+    ["red", "key"],
+    ["green", "door_closed"],
+    ["green", "key"],
+    ["blue", "door_closed"],
+    ["blue", "key"],
+    ["purple", "door_closed"],
+    ["purple", "key"],
+    ["turquoise", "door_closed"],
+    ["turquoise", "key"],
+    ["purple_bright", "ameba1"],
+    ["blue_bright", "ameba2"], 
+    ["red", "ledge_right"],   
+    ["red", "ledge_left"], 
+    ["yellow_bright", "coin"],
+    ["green", "spike1"],
 ];
 
 function Textures() {
@@ -63,16 +81,32 @@ function Textures() {
 
 Textures.prototype.load = function(on_complete) {
 
-    $("body").append("<canvas id='blender' width='512' height='512' style='width: 512px; height: 512px; display: none;'></canvas>");
-    var blender = $("#blender")[0];
-    var x = blender.getContext("2d");
+    $.ajax({
+        url: "../data/tex.json",
+        dataType: "json",
+        success: bind(this, function(data) {
+            for(var i = 0; i < data.frames.length; i++) {
+                var f = data.frames[i];
+                TEXTURES[f.filename] = {
+                    x: (f.frame.x/16)|0,
+                    y: (f.frame.y/16)|0,
+                    w: (f.frame.w/16)|0,
+                    h: (f.frame.h/16)|0
+                }
+            }
 
-    var tex_img = new Image();
-    tex_img.onload = bind(this, function() {
-        this.tex_loaded(x, blender, tex_img);
-        on_complete();
+            $("body").append("<canvas id='blender' width='512' height='512' style='width: 512px; height: 512px; display: none;'></canvas>");
+            var blender = $("#blender")[0];
+            var x = blender.getContext("2d");
+
+            var tex_img = new Image();
+            tex_img.onload = bind(this, function() {
+                this.tex_loaded(x, blender, tex_img);
+                on_complete();
+            });
+            tex_img.src = "data/tex.png?cb=" + Date.now();
+        })
     });
-    tex_img.src = "data/tex.png";
 };
 
 Textures.prototype.tex_loaded = function(x, blender, tex_img) {
