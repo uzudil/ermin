@@ -68,15 +68,57 @@ var BLOCKS = [
     ["turquoise", "door_closed"],
     ["turquoise", "key"],
     ["purple_bright", "ameba1"],
-    ["blue_bright", "ameba2"], 
-    ["red", "ledge_right"],   
-    ["red", "ledge_left"], 
+    ["blue_bright", "ameba2"],
+    ["red", "ledge_right"],
+    ["red", "ledge_left"],
     ["yellow_bright", "coin"],
     ["green", "spike1"],
     ["blue", "book1"],
     ["blue", "book2"],
-    ["white", "window"],
+    ["white", "window"]
 ];
+
+EXTRA_INFO = {
+    "wall2": {
+        jump_thru: false
+    },
+    "brick1": {
+        jump_thru: false
+    },
+    "brick2": {
+        jump_thru: true
+    },
+    "ladder1": {
+        ladder: true
+    },
+    "door_open": {
+        door: true
+    },
+    "door_closed": {
+        door: true
+    },
+    "key": {
+        pickup: true
+    },
+    "coin": {
+        pickup:  true
+    },
+    "ledge_right": {
+        jump_thru:  true
+    },
+    "ledge_left": {
+        jump_thru:  true
+    },
+    "book1": {
+        decor: true
+    },
+    "book2": {
+        decor: true
+    },
+    "window": {
+        decor: true
+    }
+};
 
 function Textures() {
 
