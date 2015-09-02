@@ -26,6 +26,7 @@ var GameState = function(game) {
 // Load images and sounds
 GameState.prototype.preload = function() {
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+    this.game.load.audio('music', 'data/ermin.mp3');
 
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
     this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -200,6 +201,10 @@ GameState.prototype.create = function() {
     window.world = this.world;
     window.game = this.game;
     window.player = this.player;
+
+    // music
+    this.music = this.game.add.audio('music');
+    this.game.sound.play("music", 1, true);
 
     // music
 //    MIDI.loadPlugin({
