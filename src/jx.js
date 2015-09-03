@@ -68,6 +68,8 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
 };
 
 GameState.prototype.create_room = function(name) {
+    this.text.text = DESCRIPTIONS[this.room];
+
     this.ground.removeAll();
     this.platforms.removeAll();
     this.ladders.removeAll();
@@ -193,10 +195,10 @@ GameState.prototype.create = function() {
     this.world.add(this.doors);
     this.world.add(this.pickups);
 
-    this.create_room(this.room);
-
     this.text = this.game.add.text(16 + this.world.x, 8, "", { fontSize: '16px', fill: '#888' });
     this.score_text = this.game.add.text(this.game.width/2, 8, "Score: " + this.score, { fontSize: '16px', fill: '#888' });
+
+    this.create_room(this.room);
 
     this.create_mobile_controller();
 
@@ -387,7 +389,6 @@ GameState.prototype.update = function() {
     this.player.body.allowGravity = !onLadder;
     this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
 
-    this.text.text = DESCRIPTIONS[this.room];
 //    this.player.rotation = onLadder ? 0 :
 //        (this.player.body.velocity.x < 0 ? 1 : -1) *
 //        this.player.body.velocity.y * 0.001;
