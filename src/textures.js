@@ -5,8 +5,8 @@ var TEXTURES = {}; // will be filled in from tex.json
 var PALETTE = {
     black:              [0x000000, 0, 0],
     black_bright:       [0x000000, 0, 4],
-    blue:               [0x0000bb, 4, 0],
-    blue_bright:        [0x0000ff, 4, 4],
+    blue:               [0x0088bb, 4, 0],
+    blue_bright:        [0x0055dd, 4, 4],
     red:                [0xbb0000, 8, 0],
     red_bright:         [0xff0000, 8, 4],
     purple:             [0xbb00bb, 12, 0],
@@ -18,7 +18,9 @@ var PALETTE = {
     yellow:             [0xbbbb00, 24, 0],
     yellow_bright:      [0xffff00, 24, 4],
     white:              [0xbbbbbb, 28, 0],
-    white_bright:       [0xffffff, 28, 4]
+    white_bright:       [0xffffff, 28, 4],
+    orange:              [0xbb9900, 28, 0],
+    orange_bright:       [0xffcc00, 28, 4]
 };
 
 var BLOCKS = [
@@ -39,7 +41,7 @@ var BLOCKS = [
     ["purple", "kettle1"],
     ["red_bright", "roof1"],
     ["red_bright", "roof2"],
-    ["yellow_bright", "lamp"],
+    ["orange_bright", "lamp"],
     ["yellow", "pipe_up"],
     ["red", "wall2"],
     ["blue", "wall2"],
