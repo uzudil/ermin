@@ -22,7 +22,10 @@ var GameState = function(game) {
     this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
     this.player_keys = {};
     this.score = parseInt(localStorage["score"] || "0", 10);
+    this.lives = parseInt(localStorage["lives"] || "5", 10);
+    this.room_entry_pos = null;
     this.jumping = false;
+    this.player_death = 0;
 };
 
 // Load images and sounds
@@ -37,6 +40,7 @@ GameState.prototype.preload = function() {
 
 GameState.prototype.create_player = function() {
     this.player = this.game.add.sprite(this.game.width/4, 300, 'sprites', "ermin");
+    this.room_entry_pos = { x: this.player.x, y: this.player.y };
     this.player.tint = 0xffffff;
     this.player.scale.x = this.PLAYER_SCALE;
     this.player.scale.y = this.PLAYER_SCALE;
@@ -197,6 +201,7 @@ GameState.prototype.create = function() {
 
     this.text = this.game.add.text(16 + this.world.x, 8, "", { fontSize: '16px', fill: '#888' });
     this.score_text = this.game.add.text(this.game.width/2, 8, "Score: " + this.score, { fontSize: '16px', fill: '#888' });
+    this.lives_text = this.game.add.text(this.game.width - 70, 8, "Lives: " + this.lives, { fontSize: '16px', fill: '#888' });
 
     this.create_room(this.room);
 
@@ -210,29 +215,6 @@ GameState.prototype.create = function() {
     // music
     this.music = this.game.add.audio('music');
     this.game.sound.play("music", 1, true);
-
-    // music
-//    MIDI.loadPlugin({
-//		soundfontUrl: "../lib/soundfont/",
-//		instrument: "vibraphone",
-//		onprogress: function(state, progress) {
-//			console.log(state, progress);
-//		},
-//		onsuccess: function() {
-//            var player = MIDI.Player;
-//            player.loadFile("../data/ermin2.mid", player.start);
-//            player.addListener(function(data) { // set it to your own function!
-////                console.log("now=" + data.now + " end="+ data.end + " playing=" + MIDI.Player.playing);
-//
-//                if (data.now >= data.end) {
-//                    setTimeout(function() {
-//                        player.stop();
-//                        player.start();
-//                    }, 2500);
-//                }
-//            });
-//		}
-//	});
 };
 
 
@@ -284,7 +266,11 @@ GameState.prototype.get_mobile_controller_position = function(onLadder) {
     this.mobile_controller_pos.jump_active = jump_active;
 };
 
-// The update() method is called every frame
+GameState.prototype.enemyOverlap = function(player, enemy) {
+    this.player_death = Date.now() + 3000;
+    this.game.physics.arcade.isPaused = true;
+};
+
 GameState.prototype.pickupOverlap = function(player, pickup) {
     if(pickup.frameName == "key") {
         this.pickups.remove(pickup);
@@ -383,7 +369,27 @@ GameState.prototype.check_screen_edges = function() {
     return load_room;
 };
 
-GameState.prototype.update = function() {
+GameState.prototype.update_player_death = function() {
+    if(Date.now() < this.player_death) {
+        this.player.rotation += 0.02 * this.game.time.elapsed;
+        this.player.y -= 0.05 * this.game.time.elapsed;
+    } else {
+        if(this.player.y < this.game.height) {
+            this.player.rotation = Math.PI;
+            this.player.y += 0.5 * this.game.time.elapsed;
+        } else {
+            this.player.x = this.room_entry_pos.x;
+            this.player.y = this.room_entry_pos.y;
+            this.player.rotation = 0;
+            this.lives--;
+            this.lives_text.text = "Lives: " + this.lives;
+            this.player_death = 0;
+            this.game.physics.arcade.isPaused = false;
+        }
+    }
+};
+
+GameState.prototype.update_game = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
 
     this.player.body.allowGravity = !onLadder;
@@ -420,8 +426,8 @@ GameState.prototype.update = function() {
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;
-    if(this.jumping) {
-        if(onTheGround || onLadder) {
+    if (this.jumping) {
+        if (onTheGround || onLadder) {
             this.player.rotation = 0;
             this.jumping = false;
         } else {
@@ -429,14 +435,14 @@ GameState.prototype.update = function() {
         }
     }
 
-    if((onTheGround || onLadder) && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || this.mobile_controller_pos.jump_active)) {
+    if ((onTheGround || onLadder) && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || this.mobile_controller_pos.jump_active)) {
         this.player.body.acceleration.y = 0;
         this.player.body.velocity.y = this.JUMP_SPEED;
         this.jumping = true;
     } else if (onLadder) {
-        if(this.input.keyboard.isDown(Phaser.Keyboard.UP) || this.mobile_controller_pos.dy < 0) {
+        if (this.input.keyboard.isDown(Phaser.Keyboard.UP) || this.mobile_controller_pos.dy < 0) {
             this.player.body.acceleration.y = -this.ACCELERATION;
-        } else if(this.input.keyboard.isDown(Phaser.Keyboard.DOWN) || this.mobile_controller_pos.dy > 0) {
+        } else if (this.input.keyboard.isDown(Phaser.Keyboard.DOWN) || this.mobile_controller_pos.dy > 0) {
             this.player.body.acceleration.y = this.ACCELERATION;
         } else {
             this.player.body.acceleration.y = this.player.body.velocity.y = 0;
@@ -444,15 +450,15 @@ GameState.prototype.update = function() {
     }
 
     // animation
-    if(this.player.body.velocity.x == 0 && !this.player.animations.paused) {
+    if (this.player.body.velocity.x == 0 && !this.player.animations.paused) {
         this.player.animations.paused = true;
         this.player.animations.frameName = "ermin";
-    } else if(this.player.body.velocity.x != 0 && this.player.animations.paused) {
+    } else if (this.player.body.velocity.x != 0 && this.player.animations.paused) {
         this.player.animations.paused = false;
     }
 
     // directional sprite
-    if(this.player.body.velocity.x != 0) {
+    if (this.player.body.velocity.x != 0) {
         this.player.scale.x = this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE;
     }
 
@@ -460,12 +466,23 @@ GameState.prototype.update = function() {
     this.enemies.forEach(this.move_enemy, this, true);
 
     // todo: enemies collision check
+    this.game.physics.arcade.overlap(this.player, this.enemies.children, this.enemyOverlap, null, this);
 
     // screen boundary checking
     var load_room = this.check_screen_edges();
-    if(load_room) {
+    if (load_room) {
         this.room = load_room;
         this.create_room(this.room);
+        this.room_entry_pos.x = this.player.x;
+        this.room_entry_pos.y = this.player.y;
+    }
+};
+
+GameState.prototype.update = function() {
+    if(this.player_death != 0) {
+        this.update_player_death()
+    } else {
+        this.update_game();
     }
 };
 
