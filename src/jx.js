@@ -22,6 +22,7 @@ var GameState = function(game) {
     this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
     this.player_keys = {};
     this.score = parseInt(localStorage["score"] || "0", 10);
+    this.jumping = false;
 };
 
 // Load images and sounds
@@ -382,13 +383,14 @@ GameState.prototype.check_screen_edges = function() {
 
 GameState.prototype.update = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
+
     this.player.body.allowGravity = !onLadder;
     this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
 
     this.text.text = DESCRIPTIONS[this.room];
-    this.player.rotation = onLadder ? 0 :
-        (this.player.body.velocity.x < 0 ? 1 : -1) *
-        this.player.body.velocity.y * 0.001;
+//    this.player.rotation = onLadder ? 0 :
+//        (this.player.body.velocity.x < 0 ? 1 : -1) *
+//        this.player.body.velocity.y * 0.001;
 
     // Collide the player with the ground
     if (!onLadder && player.body.velocity.y > 0) {
@@ -417,9 +419,19 @@ GameState.prototype.update = function() {
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;
+    if(this.jumping) {
+        if(onTheGround || onLadder) {
+            this.player.rotation = 0;
+            this.jumping = false;
+        } else {
+            this.player.rotation += (this.player.scale.x < 0 ? -1 : 1) * 0.01 * this.game.time.elapsed;
+        }
+    }
+
     if((onTheGround || onLadder) && (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || this.mobile_controller_pos.jump_active)) {
-        // Jump when the player is touching the ground and the up arrow is pressed
+        this.player.body.acceleration.y = 0;
         this.player.body.velocity.y = this.JUMP_SPEED;
+        this.jumping = true;
     } else if (onLadder) {
         if(this.input.keyboard.isDown(Phaser.Keyboard.UP) || this.mobile_controller_pos.dy < 0) {
             this.player.body.acceleration.y = -this.ACCELERATION;
@@ -443,11 +455,10 @@ GameState.prototype.update = function() {
         this.player.scale.x = this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE;
     }
 
-
     // move enemies
     this.enemies.forEach(this.move_enemy, this, true);
 
-    // enemies collision check
+    // todo: enemies collision check
 
     // screen boundary checking
     var load_room = this.check_screen_edges();
