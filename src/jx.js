@@ -333,6 +333,43 @@ GameState.prototype.move_enemy = function(child) {
     en.move(this, child, en);
 };
 
+GameState.prototype.check_screen_edges = function() {
+    var pw = Math.abs(this.player.width);
+    var ph = Math.abs(this.player.height);
+    var load_room = null;
+    if(this.player.x < 0 && this.player.body.velocity.x < 0) {
+        load_room = WORLD[this.room][0];
+        if(load_room) {
+            this.player.x = this.game.width - pw;
+        } else {
+            this.player.x = 0;
+        }
+    } else if(this.player.x >= this.game.width - pw * .6 && this.player.body.velocity.x > 0) {
+        load_room = WORLD[this.room][1];
+        if(load_room) {
+            this.player.x = 0;
+        } else {
+            this.player.x = this.game.width - pw;
+        }
+    }
+    if(this.player.y < 0 && this.player.body.velocity.y < 0) {
+        load_room = WORLD[this.room][2];
+        if(load_room) {
+            this.player.y = this.game.height - ph;
+        } else {
+            this.player.y = 0;
+        }
+    } else if(this.player.y >= this.game.height - ph * .6 && this.player.body.velocity.y > 0) {
+        load_room = WORLD[this.room][3];
+        if(load_room) {
+            this.player.y = 0;
+        } else {
+            this.player.y = this.game.height - ph;
+        }
+    }
+    return load_room;
+};
+
 GameState.prototype.update = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
     this.player.body.allowGravity = !onLadder;
@@ -403,23 +440,7 @@ GameState.prototype.update = function() {
     // enemies collision check
 
     // screen boundary checking
-    var pw = Math.abs(this.player.width);
-    var load_room = null;
-    if(this.player.x < 0 && this.player.body.velocity.x < 0) {
-        load_room = WORLD[this.room][0];
-        if(load_room) {
-            this.player.x = this.game.width - pw;
-        } else {
-            this.player.x = 0;
-        }
-    } else if(this.player.x >= this.game.width - pw * .6 && this.player.body.velocity.x > 0) {
-        load_room = WORLD[this.room][1];
-        if(load_room) {
-            this.player.x = 0;
-        } else {
-            this.player.x = this.game.width - pw;
-        }
-    }
+    var load_room = this.check_screen_edges();
     if(load_room) {
         this.room = load_room;
         this.create_room(this.room);
