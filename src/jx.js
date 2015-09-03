@@ -21,6 +21,7 @@ var GameState = function(game) {
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
     this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
     this.player_keys = {};
+    this.score = parseInt(localStorage["score"] || "0", 10);
 };
 
 // Load images and sounds
@@ -193,7 +194,8 @@ GameState.prototype.create = function() {
 
     this.create_room(this.room);
 
-    this.text = this.game.add.text(16 + this.world.x, 16, "", { fontSize: '16px', fill: '#888' });
+    this.text = this.game.add.text(16 + this.world.x, 8, "", { fontSize: '16px', fill: '#888' });
+    this.score_text = this.game.add.text(this.game.width/2, 8, "Score: " + this.score, { fontSize: '16px', fill: '#888' });
 
     this.create_mobile_controller();
 
@@ -291,6 +293,14 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
         var stored_room = this.getStoredRoom();
         stored_room.pickups.push([pickup.x, pickup.y]);
         localStorage[this.room] = JSON.stringify(stored_room);
+    } else if(pickup.frameName == "coin") {
+        this.pickups.remove(pickup);
+        var stored_room = this.getStoredRoom();
+        stored_room.pickups.push([pickup.x, pickup.y]);
+        localStorage[this.room] = JSON.stringify(stored_room);
+        this.score += 5;
+        localStorage["score"] = this.score;
+        this.score_text.text = "Score: " + this.score;
     }
 };
 
