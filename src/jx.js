@@ -10,26 +10,68 @@ bind = function(callerObj, method) {
     return f;
 };
 
+var MenuState = function(game) {
+
+};
+
+MenuState.prototype.preload = function() {
+    this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
+    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.game.scale.pageAlignVertically = true;
+};
+
+MenuState.prototype.create = function() {
+//    this.title_text = this.game.add.text(this.game.width/2, 100, "Ermin's Quest", { fontSize: '64px', fill: '#f00' });
+    this.title_text = this.game.add.bitmapText(this.game.width/2, 100, 'ermin', "Ermin's Quest", 48);
+    this.title_text.tint = 0xff8800;
+    this.title_text.anchor.x = 0.5;
+    this.title_text.anchor.y = 0.5;
+    this.start_text = this.game.add.bitmapText(this.game.width/2, this.game.height - 100, 'ermin', "Press space or click to start", 20);
+    this.start_text.tint = 0x0088ff;
+    this.start_text.anchor.x = 0.5;
+    this.start_text.anchor.y = 0.5;
+};
+
+MenuState.prototype.update = function() {
+    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) ||
+        ((this.game.input.activePointer.active || this.game.input.activePointer.isDown) &&
+            this.game.input.activePointer.y > this.game.height - 100)) {
+        this.game.state.start("game");
+    }
+};
+
+function get_saved_game() {
+    return JSON.parse(localStorage["ermin"] || "{}");
+}
+
+function save_game(data) {
+    localStorage["ermin"] = JSON.stringify(data);
+}
+
+function delete_saved_game() {
+    delete localStorage["ermin"];
+}
+
 var GameState = function(game) {
-    // Define movement constants
+};
+
+// Load images and sounds
+GameState.prototype.preload = function() {
     this.MAX_SPEED = 300; // pixels/second
     this.ACCELERATION = 1000; // pixels/second/second
     this.DRAG = 800; // pixels/second
     this.GRAVITY = 2600; // pixels/second/second
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
-    this.room = "start";
+    this.room = get_saved_game()["room"] || "start";
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
     this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
-    this.player_keys = {};
-    this.score = parseInt(localStorage["score"] || "0", 10);
-    this.lives = parseInt(localStorage["lives"] || "5", 10);
-    this.room_entry_pos = null;
+    this.player_keys = get_saved_game()["player_keys"] || {};
+    this.score = get_saved_game()["score"] || 0;
+    this.lives = get_saved_game()["lives"] || 5;
+    this.room_entry_pos = get_saved_game()["room_entry_pos"] || { x: this.game.width/4, y: 300 };
     this.jumping = false;
     this.player_death = 0;
-};
 
-// Load images and sounds
-GameState.prototype.preload = function() {
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
     this.game.load.audio('music', 'data/ermin.mp3');
 
@@ -39,7 +81,7 @@ GameState.prototype.preload = function() {
 };
 
 GameState.prototype.create_player = function() {
-    this.player = this.game.add.sprite(this.game.width/4, 300, 'sprites', "ermin");
+    this.player = this.game.add.sprite(this.room_entry_pos.x, this.room_entry_pos.y, 'sprites', "ermin");
     this.room_entry_pos = { x: this.player.x, y: this.player.y };
     this.player.tint = 0xffffff;
     this.player.scale.x = this.PLAYER_SCALE;
@@ -269,6 +311,11 @@ GameState.prototype.get_mobile_controller_position = function(onLadder) {
 GameState.prototype.enemyOverlap = function(player, enemy) {
     this.player_death = Date.now() + 3000;
     this.game.physics.arcade.isPaused = true;
+    this.lives--;
+    this.lives_text.text = "Lives: " + this.lives;
+    var sg = get_saved_game();
+    sg["lives"] = this.lives;
+    save_game(sg);
 };
 
 GameState.prototype.pickupOverlap = function(player, pickup) {
@@ -279,16 +326,21 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
         } else {
             this.player_keys[pickup.tint] = 1;
         }
+        var sg = get_saved_game();
+        sg["player_keys"] = this.player_keys;
         var stored_room = this.getStoredRoom();
         stored_room.pickups.push([pickup.x, pickup.y]);
-        localStorage[this.room] = JSON.stringify(stored_room);
+        sg[this.room] = stored_room;
+        save_game(sg);
     } else if(pickup.frameName == "coin") {
         this.pickups.remove(pickup);
         var stored_room = this.getStoredRoom();
         stored_room.pickups.push([pickup.x, pickup.y]);
-        localStorage[this.room] = JSON.stringify(stored_room);
+        var sg = get_saved_game();
+        sg[this.room] = stored_room;
         this.score += 5;
-        localStorage["score"] = this.score;
+        sg["score"] = this.score;
+        save_game(sg);
         this.score_text.text = "Score: " + this.score;
     }
 };
@@ -300,6 +352,9 @@ GameState.prototype.doorOverlap = function(player, door) {
         var key_count = this.player_keys[door.tint] || 0;
         if(key_count > 0) {
             this.player_keys[door.tint] = this.player_keys[door.tint] - 1;
+            var sg = get_saved_game();
+            sg["player_keys"] = this.player_keys;
+            save_game(sg);
 
             this.doors.remove(door);
             this.create_block(door.x, door.y, "door_open", this.doors, door.tint);
@@ -307,7 +362,9 @@ GameState.prototype.doorOverlap = function(player, door) {
             // store this opened door
             var stored_room = this.getStoredRoom();
             stored_room.open_doors.push([door.x, door.y]);
-            localStorage[this.room] = JSON.stringify(stored_room);
+            var sg = get_saved_game();
+            sg[this.room] = stored_room;
+            save_game(sg);
         } else {
             this.game.physics.arcade.collide(player, door);
         }
@@ -315,16 +372,11 @@ GameState.prototype.doorOverlap = function(player, door) {
 };
 
 GameState.prototype.getStoredRoom = function() {
-    var stored_room;
-    if(this.room in localStorage) {
-        stored_room = JSON.parse(localStorage[this.room]);
-    } else {
-        stored_room = {
-            "open_doors": [],
-            "pickups": []
-        };
-    }
-    return stored_room;
+    var sg = get_saved_game();
+    return sg[this.room] || {
+        "open_doors": [],
+        "pickups": []
+    };
 };
 
 GameState.prototype.move_enemy = function(child) {
@@ -381,10 +433,12 @@ GameState.prototype.update_player_death = function() {
             this.player.x = this.room_entry_pos.x;
             this.player.y = this.room_entry_pos.y;
             this.player.rotation = 0;
-            this.lives--;
-            this.lives_text.text = "Lives: " + this.lives;
             this.player_death = 0;
             this.game.physics.arcade.isPaused = false;
+            if(this.lives <= 0) {
+                this.game.state.start("menu");
+                delete_saved_game();
+            }
         }
     }
 };
@@ -400,7 +454,7 @@ GameState.prototype.update_game = function() {
 //        this.player.body.velocity.y * 0.001;
 
     // Collide the player with the ground
-    if (!onLadder && player.body.velocity.y > 0) {
+    if (!onLadder && this.player.body.velocity.y > 0) {
         this.game.physics.arcade.collide(this.player, this.platforms);
     }
     this.game.physics.arcade.collide(this.player, this.ground);
@@ -472,9 +526,13 @@ GameState.prototype.update_game = function() {
     var load_room = this.check_screen_edges();
     if (load_room) {
         this.room = load_room;
+        var sg = get_saved_game();
+        sg["room"] = this.room;
         this.create_room(this.room);
         this.room_entry_pos.x = this.player.x;
         this.room_entry_pos.y = this.player.y;
+        sg["room_entry_pos"] = this.room_entry_pos;
+        save_game(sg);
     }
 };
 
@@ -486,5 +544,6 @@ GameState.prototype.update = function() {
     }
 };
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game');
-game.state.add('game', GameState, true);
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'menu');
+game.state.add('game', GameState, false);
+game.state.add('menu', MenuState, true);
