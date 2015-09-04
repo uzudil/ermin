@@ -1,7 +1,12 @@
-// This example uses the Phaser 2.2.2 framework
+// Heads on Stick, Inc (c) 2015
+// Licensed under the terms of the MIT License
 
+// Uses example code from:
 // Copyright © 2014 John Watson
 // Licensed under the terms of the MIT License
+
+var settings = JSON.parse(localStorage["ermin_settings"] || '{ "volume": 1 }');
+var VOLUME = settings.volume; // 0-1
 
 bind = function(callerObj, method) {
     var f = function() {
@@ -25,7 +30,7 @@ MenuState.prototype.create = function() {
     this.title_text.tint = 0xff8800;
     this.title_text.anchor.x = 0.5;
     this.title_text.anchor.y = 0.5;
-    this.title_text2 = this.game.add.bitmapText(this.game.width/2, 160, 'ermin', "Heads on Stick Studios (c) 2015", 16);
+    this.title_text2 = this.game.add.bitmapText(this.game.width/2, 160, 'ermin', "Heads on Stick, Inc (c) 2015", 16);
     this.title_text2.tint = 0x888888;
     this.title_text2.anchor.x = 0.5;
     this.title_text2.anchor.y = 0.5;
@@ -40,6 +45,49 @@ MenuState.prototype.update = function() {
         ((this.game.input.activePointer.active || this.game.input.activePointer.isDown) &&
             this.game.input.activePointer.y > this.game.height - 100)) {
         this.game.state.start("game");
+    }
+};
+
+var IntroState = function(game) {
+
+};
+
+IntroState.prototype.preload = function() {
+    this.game.load.image('heads', 'data/heads.png');
+    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.game.scale.pageAlignVertically = true;
+};
+
+IntroState.prototype.create = function() {
+    this.game.stage.backgroundColor = '#000000';
+    this.logo = this.game.add.sprite(this.game.width/2, this.game.height/2, 'heads');
+    this.logo.tint = 0x888888;
+    this.logo.alpha = 0;
+    this.logo.anchor.x = 0.5;
+    this.logo.anchor.y = 0.5;
+    this.logo.scale.x = 0.5;
+    this.logo.scale.y = 0.5;
+    this.dir = 1;
+};
+
+IntroState.prototype.update = function() {
+    this.logo.alpha += this.game.time.elapsed * 0.00035 * this.dir;
+    if(this.dir == 1) {
+        if(this.logo.alpha >= 1) {
+            this.logo.alpha = 1;
+            this.dir = -1;
+        }
+    } else {
+        if(this.logo.alpha <= 0) {
+            this.logo.alpha = 0;
+            this.game.state.start("menu");
+        }
+    }
+    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) ||
+        this.input.keyboard.isDown(Phaser.Keyboard.ESC) ||
+        this.input.keyboard.isDown(Phaser.Keyboard.ENTER) ||
+        this.game.input.activePointer.isDown) {
+        this.game.state.start("menu");
     }
 };
 
@@ -80,8 +128,25 @@ GameState.prototype.preload = function() {
     this.game.load.audio('music', 'data/ermin.mp3');
 
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
-    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.game.scale.pageAlignVertically = true;
+    this.game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
+    window.onresize = bind(this, this.windowResized);
+    this.windowResized();
+};
+
+GameState.prototype.windowResized = function() {
+    var w, h;
+    console.log("window=" + window.innerWidth + "," + window.innerHeight);
+    if(window.innerWidth < window.innerHeight) {
+        console.log("width");
+        w = window.innerWidth * 0.9;
+        h = Math.min((w / this.game.width) * game.height, window.innerHeight * 0.99);
+    } else {
+        console.log("height");
+        h = window.innerHeight * 0.9;
+        w = Math.min((h / this.game.height) * game.width, window.innerWidth * 0.9);
+    }
+    console.log("game=" + w + "," + h);
+    this.game.scale.setMinMax(w, h, w, h);
 };
 
 GameState.prototype.create_player = function() {
@@ -273,6 +338,7 @@ GameState.prototype.create = function() {
     // music
     this.music = this.game.add.audio('music');
     this.game.sound.play("music", 1, true);
+    this.game.sound.volume = VOLUME;
 };
 
 
@@ -552,6 +618,14 @@ GameState.prototype.update_game = function() {
 };
 
 GameState.prototype.update = function() {
+    // a quick hack
+    if(this.game.input.keyboard.isDown(Phaser.Keyboard.Q)) {
+        if(VOLUME == 1) VOLUME = 0;
+        else VOLUME = 1;
+        this.game.sound.volume = VOLUME;
+        settings["volume"] = VOLUME;
+        localStorage["ermin_settings"] = JSON.stringify(settings);
+    }
     if(this.player_death != 0) {
         this.update_player_death()
     } else {
@@ -561,4 +635,5 @@ GameState.prototype.update = function() {
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'menu');
 game.state.add('game', GameState, false);
-game.state.add('menu', MenuState, true);
+game.state.add('menu', MenuState, false);
+game.state.add('intro', IntroState, true);
