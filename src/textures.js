@@ -81,6 +81,9 @@ var BLOCKS = [
     ["white", "wall_decor"],
     ["white", "vase"],
     ["white", "barrel"],
+    ["white", "column"],
+    ["white", "arch1"],
+    ["white", "arch2"],
 ];
 
 EXTRA_INFO = {
@@ -130,6 +133,15 @@ EXTRA_INFO = {
         decor: true
     },
     "barrel": {
+        decor: true
+    },
+    "column": {
+        decor: true
+    },
+    "arch1": {
+        decor: true
+    },
+    "arch2": {
         decor: true
     },
 };
