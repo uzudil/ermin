@@ -21,12 +21,15 @@ MenuState.prototype.preload = function() {
 };
 
 MenuState.prototype.create = function() {
-//    this.title_text = this.game.add.text(this.game.width/2, 100, "Ermin's Quest", { fontSize: '64px', fill: '#f00' });
     this.title_text = this.game.add.bitmapText(this.game.width/2, 100, 'ermin', "Ermin's Quest", 48);
     this.title_text.tint = 0xff8800;
     this.title_text.anchor.x = 0.5;
     this.title_text.anchor.y = 0.5;
-    this.start_text = this.game.add.bitmapText(this.game.width/2, this.game.height - 100, 'ermin', "Press space or click to start", 20);
+    this.title_text2 = this.game.add.bitmapText(this.game.width/2, 160, 'ermin', "Heads on Stick Studios (c) 2015", 16);
+    this.title_text2.tint = 0x888888;
+    this.title_text2.anchor.x = 0.5;
+    this.title_text2.anchor.y = 0.5;
+    this.start_text = this.game.add.bitmapText(this.game.width/2, this.game.height - 100, 'ermin', "Press space or click to start", 16);
     this.start_text.tint = 0x0088ff;
     this.start_text.anchor.x = 0.5;
     this.start_text.anchor.y = 0.5;
@@ -72,6 +75,7 @@ GameState.prototype.preload = function() {
     this.jumping = false;
     this.player_death = 0;
 
+    this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
     this.game.load.audio('music', 'data/ermin.mp3');
 
@@ -209,9 +213,6 @@ GameState.prototype.create = function() {
     this.world.scale.x = (this.game.width - 2 * this.CONTROLLER_SIZE) / this.game.width;
     this.world.position.x = this.CONTROLLER_SIZE;
 
-    this.create_player();
-    this.world.add(this.player);
-
      // Since we're jumping we need gravity
     this.game.physics.arcade.gravity.y = this.GRAVITY;
 
@@ -241,11 +242,26 @@ GameState.prototype.create = function() {
     this.world.add(this.doors);
     this.world.add(this.pickups);
 
-    this.text = this.game.add.text(16 + this.world.x, 8, "", { fontSize: '16px', fill: '#888' });
-    this.score_text = this.game.add.text(this.game.width/2, 8, "Score: " + this.score, { fontSize: '16px', fill: '#888' });
-    this.lives_text = this.game.add.text(this.game.width - 70, 8, "Lives: " + this.lives, { fontSize: '16px', fill: '#888' });
+    this.text = this.game.add.bitmapText(16, 16, 'ermin', "", 16);
+//    this.text.tint = 0xff8800;
+    this.text.anchor.x = 0;
+    this.text.anchor.y = 0.5;
+
+    this.score_text = this.game.add.bitmapText(this.game.width - 200, 16, 'ermin', "Score: " + this.score, 16);
+//    this.text.tint = 0xff8800;
+    this.score_text.anchor.x = 1;
+    this.score_text.anchor.y = 0.5;
+
+    this.lives_text = this.game.add.bitmapText(this.game.width - 10, 16, 'ermin', "Lives: " + this.lives, 16);
+//    this.text.tint = 0xff8800;
+    this.lives_text.anchor.x = 1;
+    this.lives_text.anchor.y = 0.5;
 
     this.create_room(this.room);
+
+    // create the player last
+    this.create_player();
+    this.world.add(this.player);
 
     this.create_mobile_controller();
 
@@ -287,7 +303,6 @@ GameState.prototype.get_mobile_controller_position = function(onLadder) {
             this.controller_sprite.y = this.game.height - this.CONTROLLER_SIZE / 2 + dy;
 
             var angle = Math.atan2(dx, dy) * 180 / Math.PI;
-//        this.text.text = "" + angle.toFixed(2);
             // lock to up/down only
             if (onLadder && (Math.abs(angle) < 60 || Math.abs(angle) >= 130)) {
                 dx = 0;
