@@ -77,7 +77,10 @@ var BLOCKS = [
     ["green", "spike1"],
     ["white", "book1"],
     ["white", "book2"],
-    ["white", "window"]
+    ["white", "window"],
+    ["white", "wall_decor"],
+    ["white", "vase"],
+    ["white", "barrel"],
 ];
 
 EXTRA_INFO = {
@@ -119,7 +122,16 @@ EXTRA_INFO = {
     },
     "window": {
         decor: true
-    }
+    },
+    "wall_decor": {
+        decor: true
+    },
+    "vase": {
+        decor: true
+    },
+    "barrel": {
+        decor: true
+    },
 };
 
 function Textures() {
