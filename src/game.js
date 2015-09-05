@@ -15,15 +15,16 @@ GameState.prototype.preload = function() {
     this.DRAG = 800; // pixels/second
     this.GRAVITY = 2600; // pixels/second/second
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
-    this.room = get_saved_game()["room"] || "start";
+    var sg = get_saved_game();
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
     this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
-    this.player_keys = get_saved_game()["player_keys"] || {};
-    this.score = get_saved_game()["score"] || 0;
-    this.lives = get_saved_game()["lives"] || 5;
-    this.room_entry_pos = get_saved_game()["room_entry_pos"] || { x: this.game.width/4, y: 300 };
+    this.player_keys = sg["player_keys"] || {};
+    this.score = sg["score"] || 0;
+    this.lives = sg["lives"] || 5;
+    this.room_entry_pos = sg["room_entry_pos"] || { x: this.game.width/4, y: 300 };
     this.jumping = false;
     this.player_death = 0;
+    this.room = sg["room"] || "start";
 
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
@@ -84,6 +85,8 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
 };
 
 GameState.prototype.create_room = function(name) {
+    this.room = name;
+    this.stored_room = this.getStoredRoom();
     this.text.text = DESCRIPTIONS[this.room];
 
     this.ground.removeAll();
@@ -94,7 +97,6 @@ GameState.prototype.create_room = function(name) {
     this.doors.removeAll();
     this.pickups.removeAll();
 
-    var stored_room = this.getStoredRoom();
     var room = ROOMS[name];
     for(var x = 0; x < room.length; x++) {
         for(var y = 0; y < room[x].length; y++) {
@@ -112,8 +114,8 @@ GameState.prototype.create_room = function(name) {
                 } else if(ex && ex.pickup) {
                     group = this.pickups;
                     var f = false;
-                    for(var i = 0; i < stored_room["pickups"].length; i++) {
-                        var pos = stored_room["pickups"][i];
+                    for(var i = 0; i < this.stored_room["pickups"].length; i++) {
+                        var pos = this.stored_room["pickups"][i];
                         if(pos[0] == x * 16 && pos[1] == y * 16) {
                             f = true;
                             break;
@@ -124,8 +126,8 @@ GameState.prototype.create_room = function(name) {
                     group = this.doors;
                     // open previously opened doors
                     if(block[1] == "door_closed") {
-                        for(var i = 0; i < stored_room["open_doors"].length; i++) {
-                            var pos = stored_room["open_doors"][i];
+                        for(var i = 0; i < this.stored_room["open_doors"].length; i++) {
+                            var pos = this.stored_room["open_doors"][i];
                             if(pos[0] == x * 16 && pos[1] == y * 16) {
                                 block[1] = "door_open";
                                 break;
@@ -312,9 +314,7 @@ GameState.prototype.enemyOverlap = function(player, enemy) {
     this.game.physics.arcade.isPaused = true;
     this.lives--;
     this.lives_text.text = "Lives: " + this.lives;
-    var sg = get_saved_game();
-    sg["lives"] = this.lives;
-    save_game(sg);
+    this.save_game_state();
 };
 
 GameState.prototype.pickupOverlap = function(player, pickup) {
@@ -325,22 +325,12 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
         } else {
             this.player_keys[pickup.tint] = 1;
         }
-        var sg = get_saved_game();
-        sg["player_keys"] = this.player_keys;
-        var stored_room = this.getStoredRoom();
-        stored_room.pickups.push([pickup.x, pickup.y]);
-        sg[this.room] = stored_room;
-        save_game(sg);
+        this.stored_room.pickups.push([pickup.x, pickup.y]);
         this.update_inventory();
     } else if(pickup.frameName == "coin") {
         this.pickups.remove(pickup);
-        var stored_room = this.getStoredRoom();
-        stored_room.pickups.push([pickup.x, pickup.y]);
-        var sg = get_saved_game();
-        sg[this.room] = stored_room;
+        this.stored_room.pickups.push([pickup.x, pickup.y]);
         this.score += 5;
-        sg["score"] = this.score;
-        save_game(sg);
         this.score_text.text = "Score: " + this.score;
     }
 };
@@ -367,20 +357,11 @@ GameState.prototype.doorOverlap = function(player, door) {
         var key_count = this.player_keys[door.tint] || 0;
         if(key_count > 0) {
             this.player_keys[door.tint] = this.player_keys[door.tint] - 1;
-            var sg = get_saved_game();
-            sg["player_keys"] = this.player_keys;
-            save_game(sg);
-
             this.doors.remove(door);
             this.create_block(door.x, door.y, "door_open", this.doors, door.tint);
 
             // store this opened door
-            var stored_room = this.getStoredRoom();
-            stored_room.open_doors.push([door.x, door.y]);
-            var sg = get_saved_game();
-            sg["player_keys"] = this.player_keys;
-            sg[this.room] = stored_room;
-            save_game(sg);
+            this.stored_room.open_doors.push([door.x, door.y]);
             this.update_inventory();
         } else {
             this.game.physics.arcade.collide(player, door);
@@ -466,10 +447,6 @@ GameState.prototype.update_game = function() {
     this.player.body.allowGravity = !onLadder;
     this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
 
-//    this.player.rotation = onLadder ? 0 :
-//        (this.player.body.velocity.x < 0 ? 1 : -1) *
-//        this.player.body.velocity.y * 0.001;
-
     // Collide the player with the ground
     if (!onLadder && this.player.body.velocity.y > 0) {
         this.game.physics.arcade.collide(this.player, this.platforms);
@@ -536,21 +513,32 @@ GameState.prototype.update_game = function() {
     // move enemies
     this.enemies.forEach(this.move_enemy, this, true);
 
-    // todo: enemies collision check
+    // enemies collision check
     this.game.physics.arcade.overlap(this.player, this.enemies.children, this.enemyOverlap, null, this);
 
     // screen boundary checking
     var load_room = this.check_screen_edges();
     if (load_room) {
-        this.room = load_room;
-        var sg = get_saved_game();
-        sg["room"] = this.room;
-        this.create_room(this.room);
         this.room_entry_pos.x = this.player.x;
         this.room_entry_pos.y = this.player.y;
-        sg["room_entry_pos"] = this.room_entry_pos;
-        save_game(sg);
+
+        // save the game
+        this.save_game_state(load_room);
+
+        // switch rooms
+        this.create_room(load_room);
     }
+};
+
+GameState.prototype.save_game_state = function(next_room) {
+    var sg = get_saved_game();
+    sg["lives"] = this.lives;
+    sg["score"] = this.score;
+    sg["player_keys"] = this.player_keys;
+    sg[this.room] = this.stored_room;
+    sg["room"] = next_room || this.room;
+    sg["room_entry_pos"] = this.room_entry_pos;
+    save_game(sg);
 };
 
 GameState.prototype.update = function() {
