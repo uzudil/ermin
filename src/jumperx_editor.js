@@ -1,16 +1,12 @@
+// Heads on Stick, Inc (c) 2015
+// Licensed under the terms of the MIT License
+
 var WIDTH = 50 * BLOCK_SIZE;
 var HEIGHT = 38 * BLOCK_SIZE;
 
 function JumperXEditor() {
     // do not cache any ajax calls EVAR!!1!
     $.ajaxSetup({ cache: false });
-
-//    init_gl(bind(this, this.game_step));
-
-//    var box = new THREE.BoxGeometry(350, 350, 350);
-//    var mat = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-//    this.mesh = new THREE.Mesh(box, mat);
-//    scene.add(this.mesh);
 
     this.textures = new Textures();
     this.textures.load(bind(this, function() {

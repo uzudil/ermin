@@ -1,3 +1,6 @@
+// Heads on Stick, Inc (c) 2015
+// Licensed under the terms of the MIT License
+
 var BLOCK_SIZE = 16;
 
 var TEXTURES = {}; // will be filled in from tex.json

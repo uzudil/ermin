@@ -1,3 +1,6 @@
+// Heads on Stick, Inc (c) 2015
+// Licensed under the terms of the MIT License
+
 var spike_move = function(game_state, sprite, enemy) {
     var n = Date.now();
     if(!sprite["timer"] || n > sprite["timer"]) {
