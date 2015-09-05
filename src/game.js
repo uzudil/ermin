@@ -30,24 +30,23 @@ GameState.prototype.preload = function() {
     this.game.load.audio('music', 'data/ermin.mp3');
 
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
+    this.TOP_GUTTER = 30;
+    this.BOTTOM_GUTTER = 40;
     this.game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     window.onresize = bind(this, this.windowResized);
     this.windowResized();
 };
 
 GameState.prototype.windowResized = function() {
+    // custom resize logic so we don't get scrollbars
     var w, h;
-    console.log("window=" + window.innerWidth + "," + window.innerHeight);
     if(window.innerWidth < window.innerHeight) {
-        console.log("width");
         w = window.innerWidth * 0.9;
         h = Math.min((w / this.game.width) * game.height, window.innerHeight * 0.99);
     } else {
-        console.log("height");
         h = window.innerHeight * 0.9;
         w = Math.min((h / this.game.height) * game.width, window.innerWidth * 0.9);
     }
-    console.log("game=" + w + "," + h);
     this.game.scale.setMinMax(w, h, w, h);
 };
 
@@ -178,7 +177,20 @@ GameState.prototype.create = function() {
 
     this.world = this.game.add.group();
     this.world.scale.x = (this.game.width - 2 * this.CONTROLLER_SIZE) / this.game.width;
+    this.world.scale.y = (this.game.height - this.TOP_GUTTER - this.BOTTOM_GUTTER) / this.game.height;
     this.world.position.x = this.CONTROLLER_SIZE;
+    this.world.position.y = this.TOP_GUTTER;
+
+    // gray bars at top/bottom of screen
+    var gx = this.game.add.graphics(0, 0);
+    gx.beginFill(0x222222, 1);
+    gx.drawRect(0, 0, this.game.width, this.TOP_GUTTER);
+    gx.endFill();
+    var gx2 = this.game.add.graphics(0, this.game.height - this.BOTTOM_GUTTER);
+    gx2.beginFill(0x222222, 1);
+    gx2.drawRect(0, 0, this.game.width, this.BOTTOM_GUTTER);
+    gx2.endFill();
+//    gx.destroy();
 
      // Since we're jumping we need gravity
     this.game.physics.arcade.gravity.y = this.GRAVITY;
@@ -190,7 +202,8 @@ GameState.prototype.create = function() {
         Phaser.Keyboard.LEFT,
         Phaser.Keyboard.RIGHT,
         Phaser.Keyboard.UP,
-        Phaser.Keyboard.DOWN
+        Phaser.Keyboard.DOWN,
+        Phaser.Keyboard.SPACEBAR
     ]);
 
     this.ground = this.game.add.group();
@@ -231,6 +244,9 @@ GameState.prototype.create = function() {
     this.world.add(this.player);
 
     this.create_mobile_controller();
+
+    this.inventory = this.game.add.group();
+    this.update_inventory();
 
     // debug
     window.world = this.world;
@@ -315,6 +331,7 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
         stored_room.pickups.push([pickup.x, pickup.y]);
         sg[this.room] = stored_room;
         save_game(sg);
+        this.update_inventory();
     } else if(pickup.frameName == "coin") {
         this.pickups.remove(pickup);
         var stored_room = this.getStoredRoom();
@@ -325,6 +342,21 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
         sg["score"] = this.score;
         save_game(sg);
         this.score_text.text = "Score: " + this.score;
+    }
+};
+
+GameState.prototype.update_inventory = function() {
+    this.inventory.removeAll();
+    var x = 0;
+    var y = this.TOP_GUTTER + this.world.height;
+    for(var tint in this.player_keys) {
+        var count = this.player_keys[tint];
+        if(count > 0) {
+            this.create_block(x, y, "key", this.inventory, tint);
+            var text = this.game.add.bitmapText(x + 32, y + 3, 'ermin', "" + count, 16);
+            this.inventory.add(text);
+            x += 45;
+        }
     }
 };
 
@@ -346,8 +378,10 @@ GameState.prototype.doorOverlap = function(player, door) {
             var stored_room = this.getStoredRoom();
             stored_room.open_doors.push([door.x, door.y]);
             var sg = get_saved_game();
+            sg["player_keys"] = this.player_keys;
             sg[this.room] = stored_room;
             save_game(sg);
+            this.update_inventory();
         } else {
             this.game.physics.arcade.collide(player, door);
         }
