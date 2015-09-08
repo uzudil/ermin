@@ -85,6 +85,7 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
 };
 
 GameState.prototype.create_room = function(name) {
+    this.game.physics.arcade.isPaused = true;
     get_room(name, bind(this, function(room) {
         this.room = name;
         this.stored_room = this.getStoredRoom();
@@ -141,6 +142,7 @@ GameState.prototype.create_room = function(name) {
                 }
             }
         }
+        this.game.physics.arcade.isPaused = false;
     }));
 };
 
@@ -339,7 +341,7 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
 GameState.prototype.update_inventory = function() {
     this.inventory.removeAll();
     var x = 0;
-    var y = this.TOP_GUTTER + this.world.height;
+    var y = this.game.height - this.BOTTOM_GUTTER + 10;
     for(var tint in this.player_keys) {
         var count = this.player_keys[tint];
         if(count > 0) {
