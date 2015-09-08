@@ -10,6 +10,9 @@ function JumperXEditor() {
 
     this.textures = new Textures();
     this.textures.load(bind(this, function() {
+        $("#save_room").click(bind(this, this.save_room));
+        $("#load_room").click(bind(this, this.load_room));
+        for(var name in DESCRIPTIONS) $("#room_names").append("<option>" + name + "</option>");
         $("body").keyup(bind(this, this.keyup));
         $("body").keydown(bind(this, this.keydown));
 
@@ -33,6 +36,22 @@ function JumperXEditor() {
 //        animate();
     }));
 }
+
+JumperXEditor.prototype.load_room = function() {
+    get_room($("#room_names").val(), bind(this, function(room_data) {
+        this.load(room_data);
+    }));
+    return false;
+};
+
+JumperXEditor.prototype.save_room = function() {
+    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.room));
+
+    var e = $("#save_room");
+    e.attr("download", $('#room_name').val() + '.json');
+    e.attr("href", "data:" + data);
+//    $('<a id="download_link" href="data:' + data + '" download="' + $('#room_name').val() + '.json">Download</a>').appendTo('#ready');
+};
 
 JumperXEditor.prototype.save = function() {
     window.prompt("Copy to clipboard:", JSON.stringify(this.room));

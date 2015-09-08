@@ -85,62 +85,63 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
 };
 
 GameState.prototype.create_room = function(name) {
-    this.room = name;
-    this.stored_room = this.getStoredRoom();
-    this.text.text = DESCRIPTIONS[this.room];
+    get_room(name, bind(this, function(room) {
+        this.room = name;
+        this.stored_room = this.getStoredRoom();
+        this.text.text = DESCRIPTIONS[this.room];
 
-    this.ground.removeAll();
-    this.platforms.removeAll();
-    this.ladders.removeAll();
-    this.decor.removeAll();
-    this.enemies.removeAll();
-    this.doors.removeAll();
-    this.pickups.removeAll();
+        this.ground.removeAll();
+        this.platforms.removeAll();
+        this.ladders.removeAll();
+        this.decor.removeAll();
+        this.enemies.removeAll();
+        this.doors.removeAll();
+        this.pickups.removeAll();
 
-    var room = ROOMS[name];
-    for(var x = 0; x < room.length; x++) {
-        for(var y = 0; y < room[x].length; y++) {
-            if(room[x][y]) {
-                var block = BLOCKS[room[x][y]];
-                var color = PALETTE[block[0]][0];
-                var group;
-                var ex = EXTRA_INFO[block[1]];
-                if(block[1] in ENEMIES) {
-                    group = this.enemies;
-                } else if(ex && ex.ladder) {
-                    group = this.ladders;
-                } else if(ex && ex.decor) {
-                    group = this.decor;
-                } else if(ex && ex.pickup) {
-                    group = this.pickups;
-                    var f = false;
-                    for(var i = 0; i < this.stored_room["pickups"].length; i++) {
-                        var pos = this.stored_room["pickups"][i];
-                        if(pos[0] == x * 16 && pos[1] == y * 16) {
-                            f = true;
-                            break;
-                        }
-                    }
-                    if(f) continue;
-                } else if(ex && ex.door) {
-                    group = this.doors;
-                    // open previously opened doors
-                    if(block[1] == "door_closed") {
-                        for(var i = 0; i < this.stored_room["open_doors"].length; i++) {
-                            var pos = this.stored_room["open_doors"][i];
+        for(var x = 0; x < room.length; x++) {
+            for(var y = 0; y < room[x].length; y++) {
+                if(room[x][y]) {
+                    var block = BLOCKS[room[x][y]];
+                    var color = PALETTE[block[0]][0];
+                    var group;
+                    var ex = EXTRA_INFO[block[1]];
+                    if(block[1] in ENEMIES) {
+                        group = this.enemies;
+                    } else if(ex && ex.ladder) {
+                        group = this.ladders;
+                    } else if(ex && ex.decor) {
+                        group = this.decor;
+                    } else if(ex && ex.pickup) {
+                        group = this.pickups;
+                        var f = false;
+                        for(var i = 0; i < this.stored_room["pickups"].length; i++) {
+                            var pos = this.stored_room["pickups"][i];
                             if(pos[0] == x * 16 && pos[1] == y * 16) {
-                                block[1] = "door_open";
+                                f = true;
                                 break;
                             }
                         }
+                        if(f) continue;
+                    } else if(ex && ex.door) {
+                        group = this.doors;
+                        // open previously opened doors
+                        if(block[1] == "door_closed") {
+                            for(var i = 0; i < this.stored_room["open_doors"].length; i++) {
+                                var pos = this.stored_room["open_doors"][i];
+                                if(pos[0] == x * 16 && pos[1] == y * 16) {
+                                    block[1] = "door_open";
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        group = !ex || ex.jump_thru ? this.platforms : this.ground;
                     }
-                } else {
-                    group = !ex || ex.jump_thru ? this.platforms : this.ground;
+                    this.create_block(x * 16, y * 16, block[1], group, color);
                 }
-                this.create_block(x * 16, y * 16, block[1], group, color);
             }
         }
-    }
+    }));
 };
 
 GameState.prototype.create_mobile_controller = function() {

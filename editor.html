@@ -1,10 +1,9 @@
 <html>
 <head>
-	<title>Jumper X Level Editor</title>
+	<title>Ermin Room Editor</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 	<link rel="stylesheet" type="text/css" href="css/editor.css" />
 	<script src="lib/jquery-2.0.3.min.js" ></script>
-	<script src="lib/three.js" ></script>
 
 	<script src="src/util.js" ></script>
 	<script src="src/rooms.js" ></script>
@@ -22,7 +21,12 @@
     </div>
     <div id="status">
         <span id="loading" class="status_message">Loading...</span>
-        <span id="ready" class="status_message">Ready.</span>
+        <span id="ready" class="status_message">
+            <label>Room: <select id="room_names"></select></label>
+            <button type="button" id="load_room">Load</button> /
+            <label>Room name: <input size="8" id="room_name"></label>
+            <a href="" download="" id="save_room"><button type="button">Save</button></a>
+        </span>
     </div>
 	<script>
 		$("body").ready(function() {

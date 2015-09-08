@@ -29,11 +29,12 @@
     top: 600px;
     left: 0;
     width: 960px;
-    height: 22px;
+    height: 27px;
     background: #444;
     border-right: 1px solid #444;
     color: white;
     padding-top: 5px;
+    padding-left: 5px;
 }
 
 .status_message {
