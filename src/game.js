@@ -356,7 +356,7 @@ GameState.prototype.update_inventory = function() {
             this.create_block(x, y, "key", this.inventory, tint);
             var text = this.game.add.bitmapText(x + 35, y + 3, 'ermin', "" + count, 16);
             this.inventory.add(text);
-            x += 45;
+            x += 60;
         }
     }
 };

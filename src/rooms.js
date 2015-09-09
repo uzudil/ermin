@@ -6,10 +6,11 @@ var WORLD = {
     start: [null, "entryway", null, null],
     entryway: ["start", "drawing_room", null, null],
     drawing_room: ["entryway", "kitchen", null, "cellar"],
- 	kitchen: ["drawing_room", null, null, null],
+ 	kitchen: ["drawing_room", "garden", null, null],
  	cellar: [null, "tunnel", "drawing_room", null],
  	tunnel: ["cellar", "tunnel2", null, null],
  	tunnel2: ["tunnel", null, null, null],
+ 	garden: ["kitchen", null, null, null],
 };
 
 var DESCRIPTIONS = {
@@ -20,6 +21,7 @@ var DESCRIPTIONS = {
     cellar: "Down in the Cellar",
     tunnel: "An unused tunnel",
     tunnel2: "An unused tunnel",
+    garden: "A sunny garden",
 };
 
 // rooms cache

@@ -91,6 +91,9 @@ var BLOCKS = [
     ["white", "web"],
     ["white", "web2"],
     ["turquoise_bright", "danger"],
+    ["white", "tree"],
+    ["green", "leaf"],
+    ["green_bright", "leaf2"],
 ];
 
 EXTRA_INFO = {
@@ -155,6 +158,9 @@ EXTRA_INFO = {
         decor: true
     },
     "web2": {
+        decor: true
+    },
+    "tree": {
         decor: true
     },
 };
