@@ -87,6 +87,10 @@ var BLOCKS = [
     ["white", "column"],
     ["white", "arch1"],
     ["white", "arch2"],
+    ["turquoise", "goblin1"],
+    ["white", "web"],
+    ["white", "web2"],
+    ["turquoise_bright", "danger"],
 ];
 
 EXTRA_INFO = {
@@ -145,6 +149,12 @@ EXTRA_INFO = {
         decor: true
     },
     "arch2": {
+        decor: true
+    },
+    "web": {
+        decor: true
+    },
+    "web2": {
         decor: true
     },
 };

@@ -28,6 +28,10 @@ var horizontal_move = function(game_state, sprite, enemy) {
     if (flip) {
         sprite.body.velocity.x *= -1;
     }
+    // directional sprites
+    if (sprite.body.velocity.x != 0) {
+        sprite.scale.x = sprite.body.velocity.x < 0 ? -1 : 1;
+    }
 };
 
 var vertical_move = function(game_state, sprite, enemy) {
@@ -39,6 +43,16 @@ var vertical_move = function(game_state, sprite, enemy) {
         (sprite.y >= game_state.game.height - sprite.height && !to_up);
     if (flip) {
         sprite.body.velocity.y *= -1;
+    }
+};
+
+var oscillate_move = function(game_state, sprite, enemy) {
+    if(!sprite["delta_offset"]) sprite["delta_offset"] = 0.05;
+    sprite.anchor.y += sprite.delta_offset;
+    var to_up = sprite.delta_offset < 0;
+    var flip = (to_up && sprite.anchor.y <= -0.5) || (!to_up && sprite.anchor.y >= 0);
+    if (flip) {
+        sprite.delta_offset *= -1;
     }
 };
 
@@ -68,8 +82,18 @@ var ENEMIES =  {
         speed: 100,
         gravity: true
     },
+    "goblin1": {
+        seq: [ "goblin1", "goblin2", "goblin3" ],
+        move: horizontal_move,
+        speed: 150,
+        gravity: true
+    },
     "spike1": {
         seq: [],
         move: spike_move
+    },
+    "danger": {
+        seq: [],
+        move: oscillate_move
     }
 };

@@ -6,6 +6,8 @@
 // Licensed under the terms of the MIT License
 
 var GameState = function(game) {
+    // do not cache ajax calls
+    $.ajaxSetup({ cache: false });
 };
 
 // Load images and sounds
@@ -25,6 +27,7 @@ GameState.prototype.preload = function() {
     this.jumping = false;
     this.player_death = 0;
     this.room = sg["room"] || "start";
+    this.god_mode = false;
 
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
@@ -77,6 +80,10 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
             block.animations.play("walk");
         }
         block.body.allowGravity = ENEMIES[name].gravity;
+        if(ENEMIES[name].move == horizontal_move) {
+            block.anchor.x = 0.5;
+            block.anchor.y = 0.5;
+        }
     } else {
         block.body.immovable = true;
         block.body.allowGravity = false;
@@ -346,7 +353,7 @@ GameState.prototype.update_inventory = function() {
         var count = this.player_keys[tint];
         if(count > 0) {
             this.create_block(x, y, "key", this.inventory, tint);
-            var text = this.game.add.bitmapText(x + 32, y + 3, 'ermin', "" + count, 16);
+            var text = this.game.add.bitmapText(x + 35, y + 3, 'ermin', "" + count, 16);
             this.inventory.add(text);
             x += 45;
         }
@@ -517,7 +524,9 @@ GameState.prototype.update_game = function() {
     this.enemies.forEach(this.move_enemy, this, true);
 
     // enemies collision check
-    this.game.physics.arcade.overlap(this.player, this.enemies.children, this.enemyOverlap, null, this);
+    if(!this.god_mode) {
+        this.game.physics.arcade.overlap(this.player, this.enemies.children, this.enemyOverlap, null, this);
+    }
 
     // screen boundary checking
     var load_room = this.check_screen_edges();
@@ -546,7 +555,10 @@ GameState.prototype.save_game_state = function(next_room) {
 
 GameState.prototype.update = function() {
     // a quick hack
-    if(this.game.input.keyboard.isDown(Phaser.Keyboard.Q)) {
+    if(this.game.input.keyboard.isDown(Phaser.Keyboard.G)) {
+        this.god_mode = !this.god_mode;
+        console.log("god mode=" + this.god_mode);
+    } else if(this.game.input.keyboard.isDown(Phaser.Keyboard.Q)) {
         if(VOLUME == 1) VOLUME = 0;
         else VOLUME = 1;
         this.game.sound.volume = VOLUME;

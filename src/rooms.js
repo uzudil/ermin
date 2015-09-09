@@ -8,7 +8,8 @@ var WORLD = {
     drawing_room: ["entryway", "kitchen", null, "cellar"],
  	kitchen: ["drawing_room", null, null, null],
  	cellar: [null, "tunnel", "drawing_room", null],
- 	tunnel: ["cellar", null, "drawing_room", null],
+ 	tunnel: ["cellar", "tunnel2", null, null],
+ 	tunnel2: ["tunnel", null, null, null],
 };
 
 var DESCRIPTIONS = {
@@ -18,6 +19,7 @@ var DESCRIPTIONS = {
     kitchen: "The Cook's Palace",
     cellar: "Down in the Cellar",
     tunnel: "An unused tunnel",
+    tunnel2: "An unused tunnel",
 };
 
 // rooms cache

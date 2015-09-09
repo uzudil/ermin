@@ -240,6 +240,30 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
+	"filename": "goblin1",
+	"frame": {"x":0,"y":448,"w":48,"h":48},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":48},
+	"sourceSize": {"w":48,"h":48}
+},
+{
+	"filename": "goblin2",
+	"frame": {"x":48,"y":448,"w":48,"h":48},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":48},
+	"sourceSize": {"w":48,"h":48}
+},
+{
+	"filename": "goblin3",
+	"frame": {"x":96,"y":448,"w":48,"h":48},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":48},
+	"sourceSize": {"w":48,"h":48}
+},
+{
 	"filename": "ameba1",
 	"frame": {"x":224,"y":480,"w":32,"h":32},
 	"rotated": false,
@@ -272,12 +296,36 @@
 	"sourceSize": {"w":48,"h":48}
 },
 {
+	"filename": "web",
+	"frame": {"x":144,"y":400,"w":48,"h":48},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":48},
+	"sourceSize": {"w":48,"h":48}
+},
+{
+	"filename": "web2",
+	"frame": {"x":192,"y":400,"w":48,"h":48},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":48},
+	"sourceSize": {"w":48,"h":48}
+},
+{
 	"filename": "key",
 	"frame": {"x":240,"y":400,"w":32,"h":16},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":16},
 	"sourceSize": {"w":32,"h":16}
+},
+{
+	"filename": "danger",
+	"frame": {"x":240,"y":416,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
 },
 {
 	"filename": "door_open",
