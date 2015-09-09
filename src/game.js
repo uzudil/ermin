@@ -31,7 +31,7 @@ GameState.prototype.preload = function() {
 
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
-    this.game.load.audio('music', 'data/ermin.mp3');
+    this.game.load.audio('music', 'data/ermin.mp3?cb=' + Date.now());
 
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
     this.TOP_GUTTER = 30;
@@ -267,8 +267,9 @@ GameState.prototype.create = function() {
 
     // music
     this.music = this.game.add.audio('music');
-    this.game.sound.play("music", 1, true);
-    this.game.sound.volume = VOLUME;
+    this.music.volume = VOLUME;
+    this.music.loop = true;
+    this.music.play();
 };
 
 
@@ -444,6 +445,8 @@ GameState.prototype.update_player_death = function() {
             this.player_death = 0;
             this.game.physics.arcade.isPaused = false;
             if(this.lives <= 0) {
+                this.music.loop = false;
+                this.music.stop();
                 this.game.state.start("menu");
                 delete_saved_game();
             }
