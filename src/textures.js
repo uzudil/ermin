@@ -163,6 +163,9 @@ EXTRA_INFO = {
     "tree": {
         decor: true
     },
+    "lamp": {
+        decor: true
+    },
 };
 
 function Textures() {
