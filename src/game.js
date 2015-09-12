@@ -25,9 +25,14 @@ GameState.prototype.preload = function() {
     this.lives = sg["lives"] || 5;
     this.room_entry_pos = sg["room_entry_pos"] || { x: this.game.width/4, y: 300 };
     this.jumping = false;
+    this.jump_over = 0;
     this.player_death = 0;
     this.room = sg["room"] || "start";
     this.god_mode = false;
+    this.tap_direction = 1;
+    this.tap_timer = 0;
+    this.TAP_INTERVAL_MILLIS = 160; // pulse to music beat
+    this.TAP_DELTA = 0.1;
 
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
@@ -454,8 +459,21 @@ GameState.prototype.update_player_death = function() {
     }
 };
 
+// "pulse" the player for some added animation
+GameState.prototype.tap_player = function() {
+    this.tap_timer += this.game.time.elapsed;
+    if(this.tap_timer >= this.TAP_INTERVAL_MILLIS) {
+        this.tap_direction *= -1;
+        this.tap_timer = 0;
+    }
+    var d = this.TAP_DELTA * (this.tap_timer / this.TAP_INTERVAL_MILLIS);
+    this.player.scale.y = Math.min(this.PLAYER_SCALE, this.tap_direction == 1 ? (this.PLAYER_SCALE - this.TAP_DELTA) + d : this.PLAYER_SCALE - d);
+};
+
 GameState.prototype.update_game = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
+
+    this.tap_player();
 
     this.player.body.allowGravity = !onLadder;
     this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
