@@ -71,6 +71,7 @@ GameState.prototype.create_player = function() {
     this.player.body.drag.setTo(this.DRAG, 0); // x, y
 
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
+    this.player.animations.add("climb", ["ermin_climb1", "ermin_climb2"], 10, true, false);
     this.player.animations.play("walk");
     this.player.anchor.setTo(.5, .5);
 };
@@ -542,16 +543,24 @@ GameState.prototype.update_game = function() {
     }
 
     // animation
-    if (this.player.body.velocity.x == 0 && !this.player.animations.paused) {
-        this.player.animations.paused = true;
-        this.player.animations.frameName = "ermin";
-    } else if (this.player.body.velocity.x != 0 && this.player.animations.paused) {
-        this.player.animations.paused = false;
+    var moving = false;
+    if(onLadder) {
+        this.player.animations.play("climb");
+        moving = !(this.player.body.velocity.x == 0 && this.player.body.velocity.y == 0);
+    } else {
+        this.player.animations.play("walk");
+        moving = this.player.body.velocity.x != 0;
+        if (moving) {
+            // directional sprite
+            this.player.scale.x = this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE;
+        }
     }
 
-    // directional sprite
-    if (this.player.body.velocity.x != 0) {
-        this.player.scale.x = this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE;
+    if (!moving && !this.player.animations.paused) {
+        this.player.animations.paused = true;
+        this.player.animations.frameName = onLadder ? "ermin_climb1" : "ermin";
+    } else if (moving && this.player.animations.paused) {
+        this.player.animations.paused = false;
     }
 
     // move enemies
