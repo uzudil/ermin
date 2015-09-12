@@ -38,6 +38,7 @@ GameState.prototype.preload = function() {
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
     this.game.load.audio('music', 'data/ermin.mp3?cb=' + Date.now());
 
+    this.accelerated = this.game.renderType == Phaser.WEBGL;
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
     this.TOP_GUTTER = 30;
     this.BOTTOM_GUTTER = 40;
@@ -123,6 +124,7 @@ GameState.prototype.create_room = function(name) {
                     } else if(ex && ex.ladder) {
                         group = this.ladders;
                     } else if(ex && ex.decor) {
+                        if(!this.accelerated) continue;
                         group = this.decor;
                     } else if(ex && ex.pickup) {
                         group = this.pickups;
@@ -473,7 +475,7 @@ GameState.prototype.tap_player = function() {
 GameState.prototype.update_game = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
 
-    this.tap_player();
+    if(this.accelerated) this.tap_player();
 
     this.player.body.allowGravity = !onLadder;
     this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
