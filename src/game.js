@@ -25,7 +25,7 @@ GameState.prototype.preload = function() {
     this.lives = sg["lives"] || 5;
     this.room_entry_pos = sg["room_entry_pos"] || { x: this.game.width/4, y: 300 };
     this.jumping = false;
-    this.jump_over = 0;
+    this.jump_over = false;
     this.player_death = 0;
     this.room = sg["room"] || "start";
     this.god_mode = false;
@@ -478,8 +478,18 @@ GameState.prototype.update_game = function() {
     this.player.body.allowGravity = !onLadder;
     this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
 
-    // Collide the player with the ground
-    if (!onLadder && this.player.body.velocity.y > 0) {
+    // Jumping is "over" (ie. will start colliding with jump-thru platforms),
+    // when we're heading down and pass an area of no platforms (free space).
+    //
+    // This is we can jump in a smooth arc when there are jump-thru platforms
+    // overhead.
+    if(this.jumping && !this.jump_over && this.player.body.velocity.y > 0) {
+        if(!this.game.physics.arcade.overlap(this.player, this.platforms)) this.jump_over = true;
+    }
+
+    // collision detection
+    if (!onLadder && (!this.jumping || this.jump_over)) {
+        // don't collide with jump-thru platforms when still jumping (see comment above)
         this.game.physics.arcade.collide(this.player, this.platforms);
     }
     this.game.physics.arcade.collide(this.player, this.ground);
@@ -509,6 +519,7 @@ GameState.prototype.update_game = function() {
         if (onTheGround || onLadder) {
             this.player.rotation = 0;
             this.jumping = false;
+            this.jump_over = false;
         } else {
             this.player.rotation += (this.player.scale.x < 0 ? -1 : 1) * 0.01 * this.game.time.elapsed;
         }
