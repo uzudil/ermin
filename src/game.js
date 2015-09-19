@@ -73,9 +73,7 @@ GameState.prototype.create_player = function() {
     this.player.body.drag.setTo(this.DRAG, 0); // x, y
 
     // reduce hitbox size a bit
-    // I don't understand how this function works...
-    // These numbers are by trial and error... the sprite is 48x48 so 12x32?!
-    this.player.body.setSize(12,32,4,4);
+    this.player.body.setSize(40,40,4,4);
 
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
     this.player.animations.add("climb", ["ermin_climb1", "ermin_climb2"], 10, true, false);
