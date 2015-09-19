@@ -19,7 +19,7 @@ GameState.prototype.preload = function() {
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
     var sg = get_saved_game();
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
-    this.PLAYER_SCALE = 0.8; // downscale the player so it fits into same-size places
+    this.PLAYER_SCALE = 1.0; // downscale the player so it fits into same-size places
     this.player_keys = sg["player_keys"] || {};
     this.score = sg["score"] || 0;
     this.lives = sg["lives"] || 5;
@@ -39,7 +39,7 @@ GameState.prototype.preload = function() {
     this.game.load.audio('music', 'data/ermin.mp3?cb=' + Date.now());
 
     this.accelerated = this.game.renderType == Phaser.WEBGL;
-    this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 100;
+    this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 120;
     this.TOP_GUTTER = 30;
     this.BOTTOM_GUTTER = 40;
     this.game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
@@ -48,14 +48,14 @@ GameState.prototype.preload = function() {
 };
 
 GameState.prototype.windowResized = function() {
-    // custom resize logic so we don't get scrollbars
     var w, h;
+    var real_width = this.game.width + 2 * this.CONTROLLER_SIZE;
     if(window.innerWidth < window.innerHeight) {
-        w = window.innerWidth * 0.9;
-        h = Math.min((w / this.game.width) * game.height, window.innerHeight * 0.99);
+        w = window.innerWidth;
+        h = Math.min((w / real_width) * game.height, window.innerHeight);
     } else {
-        h = window.innerHeight * 0.9;
-        w = Math.min((h / this.game.height) * game.width, window.innerWidth * 0.9);
+        h = window.innerHeight;
+        w = Math.min((h / this.game.height) * real_width, window.innerWidth);
     }
     this.game.scale.setMinMax(w, h, w, h);
 };
@@ -69,6 +69,11 @@ GameState.prototype.create_player = function() {
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 2); // x, y
     this.player.body.drag.setTo(this.DRAG, 0); // x, y
+
+    // reduce hitbox size a bit
+    // I don't understand how this function works...
+    // These numbers are by trial and error... the sprite is 48x48 so 12x32?!
+    this.player.body.setSize(12,32,4,4);
 
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
     this.player.animations.add("climb", ["ermin_climb1", "ermin_climb2"], 10, true, false);
@@ -242,17 +247,17 @@ GameState.prototype.create = function() {
     this.world.add(this.doors);
     this.world.add(this.pickups);
 
-    this.text = this.game.add.bitmapText(16, 16, 'ermin', "", 16);
+    this.text = this.game.add.bitmapText(this.CONTROLLER_SIZE + 16, 16, 'ermin', "", 16);
 //    this.text.tint = 0xff8800;
     this.text.anchor.x = 0;
     this.text.anchor.y = 0.5;
 
-    this.score_text = this.game.add.bitmapText(this.game.width - 200, 16, 'ermin', "Score: " + this.score, 16);
+    this.score_text = this.game.add.bitmapText(this.game.width - 200 - this.CONTROLLER_SIZE, 16, 'ermin', "Score: " + this.score, 16);
 //    this.text.tint = 0xff8800;
     this.score_text.anchor.x = 1;
     this.score_text.anchor.y = 0.5;
 
-    this.lives_text = this.game.add.bitmapText(this.game.width - 10, 16, 'ermin', "Lives: " + this.lives, 16);
+    this.lives_text = this.game.add.bitmapText(this.game.width - 10 - this.CONTROLLER_SIZE, 16, 'ermin', "Lives: " + this.lives, 16);
 //    this.text.tint = 0xff8800;
     this.lives_text.anchor.x = 1;
     this.lives_text.anchor.y = 0.5;
@@ -356,7 +361,7 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
 
 GameState.prototype.update_inventory = function() {
     this.inventory.removeAll();
-    var x = 0;
+    var x = this.CONTROLLER_SIZE;
     var y = this.game.height - this.BOTTOM_GUTTER + 10;
     for(var tint in this.player_keys) {
         var count = this.player_keys[tint];
