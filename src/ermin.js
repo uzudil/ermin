@@ -16,7 +16,16 @@ function delete_saved_game() {
     delete localStorage["ermin"];
 }
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'menu');
+function get_query_param(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+// you can force canvas rendering via ?renderer=canvas
+var renderer = get_query_param("renderer") == "canvas" ? Phaser.CANVAS : Phaser.AUTO;
+var game = new Phaser.Game(800, 600, renderer, 'menu');
 game.state.add('game', GameState, false);
 game.state.add('menu', MenuState, false);
 game.state.add('intro', IntroState, true);

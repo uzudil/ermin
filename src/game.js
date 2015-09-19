@@ -39,7 +39,7 @@ GameState.prototype.preload = function() {
     this.game.load.audio('music', 'data/ermin.mp3?cb=' + Date.now());
 
     this.accelerated = this.game.renderType == Phaser.WEBGL;
-    this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 120;
+    this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 160;
     this.TOP_GUTTER = 30;
     this.BOTTOM_GUTTER = 40;
     this.game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
@@ -49,14 +49,16 @@ GameState.prototype.preload = function() {
 
 GameState.prototype.windowResized = function() {
     var w, h;
-    var real_width = this.game.width + 2 * this.CONTROLLER_SIZE;
-    if(window.innerWidth < window.innerHeight) {
-        w = window.innerWidth;
-        h = Math.min((w / real_width) * game.height, window.innerHeight);
-    } else {
-        h = window.innerHeight;
-        w = Math.min((h / this.game.height) * real_width, window.innerWidth);
-    }
+//    var real_width = this.game.width + 2 * this.CONTROLLER_SIZE;
+//    if(window.innerWidth < window.innerHeight) {
+//        w = window.innerWidth;
+//        h = Math.min((w / real_width) * game.height, window.innerHeight);
+//    } else {
+//        h = window.innerHeight;
+//        w = Math.min((h / this.game.height) * real_width, window.innerWidth);
+//    }
+    w = window.innerWidth;
+    h = window.innerHeight;
     this.game.scale.setMinMax(w, h, w, h);
 };
 
