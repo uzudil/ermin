@@ -56,6 +56,38 @@ var oscillate_move = function(game_state, sprite, enemy) {
     }
 };
 
+var cannonball_move = function(game_state, sprite, enemy) {
+    if(!sprite["cannon_dir"]) sprite["cannon_dir"] = 1;
+    if(sprite.body.velocity.x == 0) sprite.body.velocity.x = sprite.cannon_dir * enemy.speed;
+    var to_left = sprite.body.velocity.x < 0;
+    var hit = (sprite.body.touching.left && to_left) ||
+        (sprite.body.touching.right && !to_left) ||
+        (sprite.x <= 0 && to_left) ||
+        (sprite.x >= game_state.game.width - sprite.width && !to_left);
+    if(hit) sprite.kill();
+    else sprite.rotation += sprite.cannon_dir * 0.025 * game_state.game.time.elapsed;
+};
+
+var cannon1_move = function(game_state, sprite, enemy) {
+    create_cannonball(1, game_state, sprite, enemy);
+};
+
+var cannon2_move = function(game_state, sprite, enemy) {
+    create_cannonball(-1, game_state, sprite, enemy);
+};
+
+function create_cannonball(dir, game_state, sprite, enemy) {
+    var now = Date.now();
+    if(!sprite["cannon_timer"] || now - sprite.cannon_timer > 3000) {
+        sprite["cannon_timer"] = now;
+        var cannonball = game_state.create_block(sprite.x + (dir == 1 ? 60 : -10), sprite.y + 16, "cannonball", game_state.enemies, 0xffff00);
+        cannonball["cannon_dir"] = dir;
+        cannonball.anchor.x = 0.5;
+        cannonball.anchor.y = 0.5;
+        sprite.y -= 10; // the backfire
+    }
+}
+
 var ENEMIES =  {
     // key is the name of the shape in the room definition
     "baddy1": {
@@ -95,5 +127,21 @@ var ENEMIES =  {
     "danger": {
         seq: [],
         move: oscillate_move
+    },
+    "cannon1": {
+        seq: [],
+        move: cannon1_move,
+        gravity: true
+    },
+    "cannon2": {
+        seq: [],
+        move: cannon2_move,
+        gravity: true
+    },
+    "cannonball": {
+        seq: [],
+        speed: 250,
+        move: cannonball_move,
+        gravity: false
     }
 };

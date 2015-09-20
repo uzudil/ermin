@@ -224,6 +224,14 @@
 	"sourceSize": {"w":32,"h":16}
 },
 {
+	"filename": "cannonball",
+	"frame": {"x":224,"y":32,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+{
 	"filename": "baddy1",
 	"frame": {"x":384,"y":480,"w":32,"h":32},
 	"rotated": false,

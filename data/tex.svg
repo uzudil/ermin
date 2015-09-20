@@ -27,9 +27,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.5653125"
-     inkscape:cx="551.58809"
-     inkscape:cy="516.46612"
+     inkscape:zoom="20.168453"
+     inkscape:cx="362.66962"
+     inkscape:cy="855.60963"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -37,8 +37,8 @@
      borderlayer="false"
      objecttolerance="5"
      gridtolerance="4"
-     inkscape:window-width="1916"
-     inkscape:window-height="1156"
+     inkscape:window-width="1436"
+     inkscape:window-height="856"
      inkscape:window-x="4"
      inkscape:window-y="0"
      inkscape:window-maximized="1">
@@ -71,7 +71,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1970,5 +1970,9 @@
        id="path3328"
        d="m 536.48099,523.07551 2.05555,-1.27367 1.02778,1.71517 1.02778,3.43035 1.02778,2.57275 0,2.05964 -2.05556,0.51312 -1.02778,-0.85758 0,-0.85759 -1.02778,-2.57276 z"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+    <path
+       style="fill:#808080;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="M 358.59375 188.59375 L 356.4375 188.84375 L 353.3125 189.96875 L 352.34375 192.375 L 352 196.375 L 352.34375 199.59375 L 353 200.75 L 354 202.375 L 355.71875 203.8125 L 358 204.375 L 359.71875 204.375 L 362.1875 204 L 364.59375 203.375 L 366.25 201.875 L 367.25 199.375 L 367.59375 196.78125 L 367.46875 193.78125 L 366.625 191.625 L 365 189.375 L 362.75 188.75 L 358.59375 188.59375 z M 360.65625 189.6875 L 363.28125 190.0625 L 364.4375 191.375 L 362.75 190.375 L 360.65625 190.375 L 358.34375 191.0625 L 356.59375 192.375 L 356 194.84375 L 355.65625 192 L 357.34375 190.375 L 360.65625 189.6875 z M 354.71875 190.875 L 354 194.375 L 354.625 197.375 L 356 200.03125 L 358 201.875 L 361 202.625 L 364.34375 202.375 L 360.5625 203.375 L 357.375 203.375 L 355.21875 202.375 L 353.65625 200.09375 L 353 197.03125 L 353.3125 194 L 354.71875 190.875 z M 366.3125 195.875 L 367 197.375 L 366 200.375 L 364.28125 201.625 L 362 201.71875 L 360 201.03125 L 361.65625 201.09375 L 363.28125 200.96875 L 365.53125 199.375 L 366.3125 197.375 L 366.3125 195.875 z "
+       id="path3313" />
   </g>
 </svg>

@@ -101,6 +101,7 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
         block.body.allowGravity = false;
     }
     group.add(block);
+    return block;
 };
 
 GameState.prototype.create_room = function(name) {
