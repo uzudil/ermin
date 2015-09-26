@@ -34,6 +34,32 @@ var horizontal_move = function(game_state, sprite, enemy) {
     }
 };
 
+var zigzag_move = function(game_state, sprite, enemy) {
+    if(sprite.body.velocity.x == 0) sprite.body.velocity.x = enemy.speed;
+    var to_left = sprite.body.velocity.x < 0;
+    var flip = (sprite.body.touching.left && to_left) ||
+        (sprite.body.touching.right && !to_left) ||
+        (sprite.x <= 0 && to_left) ||
+        (sprite.x >= game_state.game.width - sprite.width && !to_left);
+    if (flip) {
+        sprite.body.velocity.x *= -1;
+    }
+    // directional sprites
+    if (sprite.body.velocity.x != 0) {
+        sprite.scale.x = sprite.body.velocity.x < 0 ? -1 : 1;
+    }
+
+    if(sprite.body.velocity.y == 0) sprite.body.velocity.y = enemy.speed;
+    var to_up = sprite.body.velocity.y < 0;
+    var flip = (sprite.body.touching.up && to_up) ||
+        (sprite.body.touching.down && !to_up) ||
+        (sprite.y <= 0 && to_up) ||
+        (sprite.y >= game_state.game.height - sprite.height && !to_up);
+    if (flip) {
+        sprite.body.velocity.y *= -1;
+    }
+};
+
 var vertical_move = function(game_state, sprite, enemy) {
     if(sprite.body.velocity.y == 0) sprite.body.velocity.y = enemy.speed;
     var to_up = sprite.body.velocity.y < 0;
@@ -142,6 +168,12 @@ var ENEMIES =  {
         seq: [],
         speed: 250,
         move: cannonball_move,
+        gravity: false
+    },
+    "butterfly1": {
+        seq: [ "butterfly1", "butterfly2" ],
+        speed: 100,
+        move: zigzag_move,
         gravity: false
     }
 };

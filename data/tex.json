@@ -272,6 +272,22 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
+	"filename": "butterfly1",
+	"frame": {"x":192,"y":448,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "butterfly2",
+	"frame": {"x":224,"y":448,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
 	"filename": "goblin1",
 	"frame": {"x":0,"y":448,"w":48,"h":48},
 	"rotated": false,

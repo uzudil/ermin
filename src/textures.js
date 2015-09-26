@@ -95,6 +95,7 @@ var BLOCKS = [
     ["green", "leaf"],
     ["green_bright", "leaf2"],
     ["red_bright", "cannonball"],
+    ["turquoise", "butterfly1"],
 ];
 
 EXTRA_INFO = {
