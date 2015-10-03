@@ -14,7 +14,8 @@ var WORLD = {
  	garden2: ["garden", "guesthouse", null, "tunnel2"],
  	guesthouse: ["garden2", null, null, "earth"],
  	earth: ["tunnel2", "earth2", "guesthouse", null],
- 	earth2: ["earth", null, null, null],
+ 	earth2: ["earth", null, null, "down"],
+    down: [null, null, "earth2", null]
 };
 
 var DESCRIPTIONS = {
@@ -30,6 +31,7 @@ var DESCRIPTIONS = {
     guesthouse: "In the guest house",
     earth: "Earthworks",
     earth2: "Earthworks",
+    down: "The Old Well",
 };
 
 // rooms cache

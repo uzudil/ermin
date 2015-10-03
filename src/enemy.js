@@ -112,13 +112,17 @@ var cannonball_move = function(game_state, sprite, enemy) {
         (sprite.body.touching.right && !to_left) ||
         (sprite.x <= 0 && to_left) ||
         (sprite.x >= game_state.game.width - sprite.width && !to_left);
-    if(hit) sprite.kill();
+    if(hit) {
+        if(sprite.body.touching.left && to_left) console.log("touching left ", sprite.body.touching.left);
+        if(sprite.body.touching.right && !to_left) console.log("touching right ", sprite.body.touching.right);
+        sprite.kill();
+    }
     else sprite.rotation += sprite.cannon_dir * 0.025 * game_state.game.time.elapsed;
 };
 
 var no_move = function(game_state, sprite, enemy) {
 
-}
+};
 
 var cannon1_move = function(game_state, sprite, enemy) {
     create_cannonball(1, game_state, sprite, enemy);
@@ -132,7 +136,7 @@ function create_cannonball(dir, game_state, sprite, enemy) {
     var now = Date.now();
     if(!sprite["cannon_timer"] || now - sprite.cannon_timer > 3000) {
         sprite["cannon_timer"] = now;
-        var cannonball = game_state.create_block(sprite.x + (dir == 1 ? 60 : -10), sprite.y + 16, "cannonball", game_state.enemies, 0xffff00);
+        var cannonball = game_state.create_block(sprite.x + (dir == 1 ? 80 : -30), sprite.y + 16, "cannonball", game_state.enemies, 0xffff00);
         cannonball["cannon_dir"] = dir;
         cannonball.anchor.x = 0.5;
         cannonball.anchor.y = 0.5;
