@@ -72,6 +72,28 @@ var vertical_move = function(game_state, sprite, enemy) {
     }
 };
 
+var piston_move = function(game_state, sprite, enemy) {
+    if(!sprite["piston_body"]) {
+        var body = game_state.create_block(sprite.x + 8, sprite.y, "piston2", game_state.enemies, sprite.tint);
+//        cannonball.anchor.x = 0.5;
+//        cannonball.anchor.y = 0.5;
+        sprite["piston_body"] = body;
+    }
+
+    if(sprite.body.velocity.y == 0) sprite.body.velocity.y = enemy.speed;
+    var to_up = sprite.body.velocity.y < 0;
+    var flip = (sprite.body.touching.down && !to_up) ||
+        (sprite.y <= 0 && to_up) ||
+        (sprite.y >= game_state.game.height - sprite.height && !to_up);
+    if (flip) {
+        sprite.body.velocity.y *= -1;
+    }
+
+    sprite.piston_body.height = sprite.y - sprite.piston_body.y;
+
+
+};
+
 var oscillate_move = function(game_state, sprite, enemy) {
     if(!sprite["delta_offset"]) sprite["delta_offset"] = 0.05;
     sprite.anchor.y += sprite.delta_offset;
@@ -93,6 +115,10 @@ var cannonball_move = function(game_state, sprite, enemy) {
     if(hit) sprite.kill();
     else sprite.rotation += sprite.cannon_dir * 0.025 * game_state.game.time.elapsed;
 };
+
+var no_move = function(game_state, sprite, enemy) {
+
+}
 
 var cannon1_move = function(game_state, sprite, enemy) {
     create_cannonball(1, game_state, sprite, enemy);
@@ -174,6 +200,18 @@ var ENEMIES =  {
         seq: [ "butterfly1", "butterfly2" ],
         speed: 100,
         move: zigzag_move,
+        gravity: false
+    },
+    "piston1": {
+        seq: [],
+        speed: 100,
+        move: piston_move,
+        gravity: false
+    },
+    "piston2": {
+        seq: [],
+        speed: 100,
+        move: no_move,
         gravity: false
     }
 };

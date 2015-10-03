@@ -224,6 +224,22 @@
 	"sourceSize": {"w":32,"h":16}
 },
 {
+	"filename": "piston1",
+	"frame": {"x":160,"y":48,"w":64,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":16},
+	"sourceSize": {"w":64,"h":16}
+},
+{
+	"filename": "piston2",
+	"frame": {"x":224,"y":48,"w":48,"h":16},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":16},
+	"sourceSize": {"w":48,"h":16}
+},
+{
 	"filename": "cannonball",
 	"frame": {"x":224,"y":32,"w":16,"h":16},
 	"rotated": false,
