@@ -113,8 +113,6 @@ var cannonball_move = function(game_state, sprite, enemy) {
         (sprite.x <= 0 && to_left) ||
         (sprite.x >= game_state.game.width - sprite.width && !to_left);
     if(hit) {
-        if(sprite.body.touching.left && to_left) console.log("touching left ", sprite.body.touching.left);
-        if(sprite.body.touching.right && !to_left) console.log("touching right ", sprite.body.touching.right);
         sprite.kill();
     }
     else sprite.rotation += sprite.cannon_dir * 0.025 * game_state.game.time.elapsed;
