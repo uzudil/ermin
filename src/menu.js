@@ -47,6 +47,7 @@ MenuState.prototype.create = function() {
     this.start["game"] = this.game;
     this.start.inputEnabled = true;
     this.start.events.onInputDown.add(start_game, this);
+    this.start.events.onInputUp.add(start_game, this);
     this.start.events.onInputOver.add(start_in, this);
     this.start.events.onInputOut.add(start_out, this);
 };
