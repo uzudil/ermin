@@ -7,8 +7,16 @@ var IntroState = function(game) {
 
 IntroState.prototype.preload = function() {
     this.game.load.image('heads', 'data/heads.png');
-    this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    this.game.scale.pageAlignVertically = true;
+    this.game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
+    window.onresize = bind(this, this.windowResized);
+    this.windowResized();
+};
+
+IntroState.prototype.windowResized = function() {
+    var w, h;
+    w = window.innerWidth;
+    h = window.innerHeight;
+    this.game.scale.setMinMax(w, h, w, h);
 };
 
 IntroState.prototype.create = function() {
