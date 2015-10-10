@@ -56,9 +56,9 @@ function start_game(item) {
     item.game.state.start("game");
 }
 
-function start_in(item) {
+function start_in(item, pointer) {
     item.tint = 0x8080ff;
-    if(item.game.input.activePointer.isDown) {
+    if(pointer != item.game.input.mousePointer) {
         start_game(item);
     }
 }
