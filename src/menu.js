@@ -58,6 +58,9 @@ function start_game(item) {
 
 function start_in(item) {
     item.tint = 0x8080ff;
+    if(item.game.input.activePointer.isDown) {
+        start_game(item);
+    }
 }
 
 function start_out(item) {
