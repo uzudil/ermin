@@ -1,6 +1,7 @@
 // Heads on Stick, Inc (c) 2015
 // Licensed under the terms of the MIT License
 
+// main menu
 var MenuState = function(game) {
 
 };
