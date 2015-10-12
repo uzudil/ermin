@@ -150,8 +150,8 @@ MenuState.prototype.update = function() {
 
     var angle = this.game.time.now * 0.001;
     var r = (((Math.sin(angle) * 128) + 128)|0);
-    var g = (((Math.sin(angle + Math.PI/2) * 128) + 128)|0);
-    var b = (((Math.sin(angle + Math.PI/3) * 128) + 128)|0);
+    var g = (((Math.sin(angle * 0.5) * 128) + 128)|0);
+    var b = (((Math.sin(angle * 2) * 128) + 128)|0);
     var color = (r << 16) + (g << 8) + b;
     this.logo.tint = color;
     this.start.tint = color;
