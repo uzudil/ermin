@@ -10,6 +10,7 @@ MenuState.prototype.preload = function() {
     this.game.load.image('ermin', 'data/ermin.png');
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+    this.game.load.audio('music', 'data/ermin-intro.mp3?cb=' + Date.now());
     this.game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
     window.onresize = bind(this, this.windowResized);
     this.windowResized();
@@ -91,9 +92,16 @@ MenuState.prototype.create = function() {
         this.enemies.push(enemy);
     }
 
+    // music
+    this.music = this.game.add.audio('music');
+//    this.music.volume = VOLUME;
+    this.music.loop = true;
+    this.music.play();
 };
 
 function start_game(item) {
+    this.music.loop = false;
+    this.music.stop();
     item.game.state.start("game");
 }
 
