@@ -19,7 +19,7 @@ GameState.prototype.preload = function() {
     this.JUMP_SPEED = -1000; // pixels/second (negative y is up)
     var sg = get_saved_game();
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
-    this.PLAYER_SCALE = 1.0; // downscale the player so it fits into same-size places
+    this.PLAYER_SCALE = 0.9; // downscale the player so it fits into same-size places
     this.player_keys = sg["player_keys"] || {};
     this.score = sg["score"] || 0;
     this.lives = sg["lives"] || 5;
@@ -283,7 +283,7 @@ GameState.prototype.create = function() {
 	this.game.input.keyboard.addKey(Phaser.Keyboard.G).onUp.add(function() {
 		this.god_mode = !this.god_mode;
         console.log("god mode=" + this.god_mode);
-	});
+	}, this);
 	this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onUp.add(function() {
 		this.return_to_menu();
 	}, this);
@@ -492,13 +492,32 @@ GameState.prototype.tap_player = function() {
     this.player.scale.y = Math.min(this.PLAYER_SCALE, this.tap_direction == 1 ? (this.PLAYER_SCALE - this.TAP_DELTA) + d : this.PLAYER_SCALE - d);
 };
 
+GameState.prototype.player_collision_detection = function(onLadder) {
+	if ((!this.jumping || this.jump_over)) {
+        // don't collide with jump-thru platforms when still jumping (see comment above)
+        this.game.physics.arcade.collide(this.player, this.platforms);
+    }
+    this.game.physics.arcade.collide(this.player, this.ground);
+};
+
+GameState.prototype.try_step_up = function(dy) {
+	this.player.body.position.y -= dy;
+	this.player.position.y -= dy;
+	if(this.game.physics.arcade.overlap(this.player, this.ground)) {
+		this.player.body.position.y += dy;
+		this.player.position.y += dy;
+		return false;
+	} else {
+		return true;
+	}
+};
+
 GameState.prototype.update_game = function() {
     var onLadder = this.game.physics.arcade.overlap(this.player, this.ladders);
 
     if(this.accelerated) this.tap_player();
 
     this.player.body.allowGravity = !onLadder;
-    this.player.body.drag.setTo(this.DRAG * (onLadder ? 10 : 1), 0);
 
     // Jumping is "over" (ie. will start colliding with jump-thru platforms),
     // when we're heading down and pass an area of no platforms (free space).
@@ -510,11 +529,6 @@ GameState.prototype.update_game = function() {
     }
 
     // collision detection
-    if (!onLadder && (!this.jumping || this.jump_over)) {
-        // don't collide with jump-thru platforms when still jumping (see comment above)
-        this.game.physics.arcade.collide(this.player, this.platforms);
-    }
-    this.game.physics.arcade.collide(this.player, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.ground);
     this.game.physics.arcade.collide(this.enemies, this.platforms);
     this.game.physics.arcade.collide(this.enemies, this.doors);
@@ -523,7 +537,6 @@ GameState.prototype.update_game = function() {
     this.game.physics.arcade.overlap(this.player, this.pickups.children, this.pickupOverlap, null, this);
 
     this.get_mobile_controller_position(onLadder);
-
     if (this.input.keyboard.isDown(Phaser.Keyboard.LEFT) || this.mobile_controller_pos.dx < 0) {
         // If the LEFT key is down, set the player velocity to move left
         this.player.body.acceleration.x = -this.ACCELERATION;
@@ -534,6 +547,18 @@ GameState.prototype.update_game = function() {
         // Stop the player from moving horizontally
         this.player.body.acceleration.x = 0;
     }
+
+	// try to not get stuck in floor when moving sideways
+	if(onLadder && this.player.body.acceleration.x != 0 && (this.game.physics.arcade.overlap(this.player, this.ground) || this.game.physics.arcade.overlap(this.player, this.platforms))) {
+		this.try_step_up(2);
+	}
+
+	// player collision detection
+	if ((!this.jumping || this.jump_over)) {
+        // don't collide with jump-thru platforms when still jumping (see comment above)
+        this.game.physics.arcade.collide(this.player, this.platforms);
+    }
+    this.game.physics.arcade.collide(this.player, this.ground);
 
     // Set a variable that is true when the player is touching the ground
     var onTheGround = this.player.body.touching.down;

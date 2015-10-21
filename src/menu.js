@@ -97,6 +97,9 @@ MenuState.prototype.create = function() {
     }
 
 	this.game.input.keyboard.addKey(Phaser.Keyboard.Q).onUp.add(toggle_volume);
+	this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onUp.add(function() {
+		start_game(this);
+	}, this);
 
     // music
     this.music = this.game.add.audio('music');
@@ -106,8 +109,8 @@ MenuState.prototype.create = function() {
 };
 
 function start_game(item) {
-    this.music.loop = false;
-    this.music.stop();
+    item.music.loop = false;
+    item.music.stop();
     item.game.state.start("game");
 }
 
