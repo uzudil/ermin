@@ -279,9 +279,18 @@ GameState.prototype.create = function() {
     window.game = this.game;
     window.player = this.player;
 
+	this.game.input.keyboard.addKey(Phaser.Keyboard.Q).onUp.add(toggle_volume);
+	this.game.input.keyboard.addKey(Phaser.Keyboard.G).onUp.add(function() {
+		this.god_mode = !this.god_mode;
+        console.log("god mode=" + this.god_mode);
+	});
+	this.game.input.keyboard.addKey(Phaser.Keyboard.ESC).onUp.add(function() {
+		this.return_to_menu();
+	}, this);
+
     // music
     this.music = this.game.add.audio('music');
-    this.music.volume = VOLUME;
+	this.game.sound.volume = VOLUME;
     this.music.loop = true;
     this.music.play();
 };
@@ -444,6 +453,12 @@ GameState.prototype.check_screen_edges = function() {
     return load_room;
 };
 
+GameState.prototype.return_to_menu = function() {
+	this.music.loop = false;
+	this.music.stop();
+	this.game.state.start("menu");
+};
+
 GameState.prototype.update_player_death = function() {
     if(Date.now() < this.player_death) {
         this.player.rotation += 0.02 * this.game.time.elapsed;
@@ -459,11 +474,9 @@ GameState.prototype.update_player_death = function() {
             this.player_death = 0;
             this.game.physics.arcade.isPaused = false;
             if(this.lives <= 0) {
-                this.music.loop = false;
-                this.music.stop();
-                this.game.state.start("menu");
                 delete_saved_game();
-            }
+				this.return_to_menu();
+			}
         }
     }
 };
@@ -603,17 +616,6 @@ GameState.prototype.save_game_state = function(next_room) {
 };
 
 GameState.prototype.update = function() {
-    // a quick hack
-    if(this.game.input.keyboard.isDown(Phaser.Keyboard.G)) {
-        this.god_mode = !this.god_mode;
-        console.log("god mode=" + this.god_mode);
-    } else if(this.game.input.keyboard.isDown(Phaser.Keyboard.Q)) {
-        if(VOLUME == 1) VOLUME = 0;
-        else VOLUME = 1;
-        this.game.sound.volume = VOLUME;
-        settings["volume"] = VOLUME;
-        localStorage["ermin_settings"] = JSON.stringify(settings);
-    }
     if(this.player_death != 0) {
         this.update_player_death()
     } else {

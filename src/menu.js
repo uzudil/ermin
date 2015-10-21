@@ -45,6 +45,10 @@ MenuState.prototype.create = function() {
     this.copyright.anchor.x = 0.5;
     this.copyright.anchor.y = 0.5;
 
+    this.volume_message = this.game.add.bitmapText(this.game.width/2, this.game.height - 120, 'ermin', "Q - toggle music", 8);
+    this.volume_message.anchor.x = 0.5;
+    this.volume_message.anchor.y = 0.5;
+
     this.start_shadow = this.game.add.bitmapText(this.game.width/2 + 3, this.game.height - 150 + 3, 'ermin', "Start Game", 32);
     this.start_shadow.anchor.x = 0.5;
     this.start_shadow.anchor.y = 0.5;
@@ -92,9 +96,11 @@ MenuState.prototype.create = function() {
         this.enemies.push(enemy);
     }
 
+	this.game.input.keyboard.addKey(Phaser.Keyboard.Q).onUp.add(toggle_volume);
+
     // music
     this.music = this.game.add.audio('music');
-//    this.music.volume = VOLUME;
+	this.game.sound.volume = VOLUME;
     this.music.loop = true;
     this.music.play();
 };

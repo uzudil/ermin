@@ -23,6 +23,15 @@ function get_query_param(name) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+function toggle_volume() {
+	if(VOLUME == 1) VOLUME = 0;
+	else VOLUME = 1;
+	this.game.sound.volume = VOLUME;
+	settings["volume"] = VOLUME;
+	localStorage["ermin_settings"] = JSON.stringify(settings);
+	console.log("VOLUME=" + VOLUME);
+}
+
 // you can force canvas rendering via ?renderer=canvas
 var renderer = get_query_param("renderer") == "canvas" ? Phaser.CANVAS : Phaser.AUTO;
 var game = new Phaser.Game(800, 600, renderer, 'menu');
