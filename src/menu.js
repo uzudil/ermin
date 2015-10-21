@@ -59,10 +59,10 @@ MenuState.prototype.create = function() {
     this.start.anchor.y = 0.5;
     this.start["game"] = this.game;
     this.start.inputEnabled = true;
-    this.start.events.onInputDown.add(start_game, this);
-    this.start.events.onInputUp.add(start_game, this);
-    this.start.events.onInputOver.add(start_in, this);
-    this.start.events.onInputOut.add(start_out, this);
+    this.start.events.onInputDown.add(this.start_game, this);
+    this.start.events.onInputUp.add(this.start_game, this);
+    this.start.events.onInputOver.add(this.start_in, this);
+    this.start.events.onInputOut.add(this.start_out, this);
 
 
     for(var x = 0; x < this.game.width; x+= 32) {
@@ -98,7 +98,7 @@ MenuState.prototype.create = function() {
 
 	this.game.input.keyboard.addKey(Phaser.Keyboard.Q).onUp.add(toggle_volume);
 	this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onUp.add(function() {
-		start_game(this);
+		this.start_game();
 	}, this);
 
     // music
@@ -108,24 +108,25 @@ MenuState.prototype.create = function() {
     this.music.play();
 };
 
-function start_game(item) {
-    item.music.loop = false;
-    item.music.stop();
-    item.game.state.start("game");
-}
+MenuState.prototype.start_game = function() {
+    this.music.loop = false;
+    this.music.stop();
+    this.game.state.start("game");
+};
 
-function start_in(item, pointer) {
+MenuState.prototype.start_in = function(item, pointer) {
     item.x += 2;
     item.y += 2;
-    if(pointer != item.game.input.mousePointer) {
-        start_game(item);
+	console.log("input=", pointer, " vs mouse=", item.game.input.mousePointer);
+    if(pointer != this.game.input.mousePointer) {
+        this.start_game();
     }
-}
+};
 
-function start_out(item) {
+MenuState.prototype.start_out = function(item) {
     item.x -= 2;
     item.y -= 2;
-}
+};
 
 MenuState.prototype.update = function() {
     var gw = this.game.width;
