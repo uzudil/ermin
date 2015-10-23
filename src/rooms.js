@@ -3,20 +3,20 @@
 
 // values in WORLD are: left,right,up,down
 var WORLD = {
-    start: [null, "entryway", null, null],
-    entryway: ["start", "drawing_room", null, null],
-    drawing_room: ["entryway", "kitchen", null, "cellar"],
- 	kitchen: ["drawing_room", "garden", null, null],
- 	cellar: [null, "tunnel", "drawing_room", null],
- 	tunnel: ["cellar", "tunnel2", null, null],
- 	tunnel2: ["tunnel", "earth", "garden2", null],
- 	garden: ["kitchen", "garden2", null, null],
- 	garden2: ["garden", "guesthouse", null, "tunnel2"],
- 	guesthouse: ["garden2", null, null, "earth"],
- 	earth: ["tunnel2", "earth2", "guesthouse", null],
- 	earth2: ["earth", null, null, "down"],
-    down: [null, null, "earth2", "down2"],
-    down2: [null, null, "down", null]
+    "start": [null, "entryway", null, null],
+    "entryway": ["start", "drawing_room", null, null],
+    "drawing_room": ["entryway", "kitchen", null, "cellar"],
+ 	"kitchen": ["drawing_room", "garden", null, null],
+ 	"cellar": [null, "tunnel", "drawing_room", null],
+ 	"tunnel": ["cellar", "tunnel2", null, null],
+ 	"tunnel2": ["tunnel", "earth", "garden2", null],
+ 	"garden": ["kitchen", "garden2", null, null],
+ 	"garden2": ["garden", "guesthouse", null, "tunnel2"],
+ 	"guesthouse": ["garden2", null, null, "earth"],
+ 	"earth": ["tunnel2", "earth2", "guesthouse", null],
+ 	"earth2": ["earth", null, null, "down"],
+    "down": [null, null, "earth2", "down2"],
+    "down2": [null, null, "down", null]
 };
 
 var DESCRIPTIONS = {

@@ -96,7 +96,7 @@ var BLOCKS = [
     ["green_bright", "leaf2"],
     ["red_bright", "cannonball"],
     ["turquoise", "butterfly1"],
-    ["turquoise", "piston1"],
+    ["turquoise", "piston1"]
 ];
 
 EXTRA_INFO = {
