@@ -227,7 +227,7 @@ Textures.prototype.load = function(on_complete) {
                 }
             }
 
-            $("body").append("<canvas id='blender' width='512' height='512' style='width: 512px; height: 512px; display: none;'></canvas>");
+            $("body").append("<canvas id='blender' width='1024' height='1024' style='width: 512px; height: 512px; display: none;'></canvas>");
             var blender = $("#blender")[0];
             var x = blender.getContext("2d");
 
@@ -282,14 +282,15 @@ Textures.prototype.get_div = function(block_index, id, css_class, style) {
     var block = BLOCKS[block_index];
     var color = block[0];
     var tex = TEXTURES[block[1]];
-    var w = tex.w * BLOCK_SIZE;
-    var h = tex.h * BLOCK_SIZE;
+    var w = tex.w * BLOCK_SIZE * ATLAS_SCALE;
+    var h = tex.h * BLOCK_SIZE * ATLAS_SCALE;
     var src = $("#tex_" + color).attr("data-src");
     return "<div id='" + id + "' class='" + css_class + "' " +
         " data-block_index='" + block_index + "' " +
         "style='" +
         " background-image: URL(" + src + "); " +
-        " background-position: " + (-tex.x * BLOCK_SIZE) + "px " + (-tex.y * BLOCK_SIZE) + "px; " +
+		" background-size: 512px; " +
+        " background-position: " + (-tex.x * BLOCK_SIZE * ATLAS_SCALE) + "px " + (-tex.y * BLOCK_SIZE * ATLAS_SCALE) + "px; " +
         "width: " + w + "px; " +
         "height: " + h + "px; " +
         (style ? style : "") +

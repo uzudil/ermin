@@ -86,8 +86,8 @@ JumperXEditor.prototype.keydown = function(event) {
         handled = true;
     } else {
         var t = TEXTURES[BLOCKS[this.selected_block][1]];
-        var step_x = t.w;
-        var step_y = t.h;
+        var step_x = (t.w * ATLAS_SCALE)|0;
+        var step_y = (t.h * ATLAS_SCALE)|0;
         if(!!window.event.shiftKey) {
             step_x = step_y = 1;
         }

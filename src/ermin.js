@@ -34,8 +34,10 @@ function toggle_volume() {
 }
 
 // you can force canvas rendering via ?renderer=canvas
-var renderer = get_query_param("renderer") == "canvas" ? Phaser.CANVAS : Phaser.AUTO;
-var game = new Phaser.Game(800, 600, renderer, 'menu');
-game.state.add('game', GameState, false);
-game.state.add('menu', MenuState, false);
-game.state.add('intro', IntroState, true);
+if(window["Phaser"]) {
+	var renderer = get_query_param("renderer") == "canvas" ? Phaser.CANVAS : Phaser.AUTO;
+	var game = new Phaser.Game(800, 600, renderer, 'menu');
+	game.state.add('game', GameState, false);
+	game.state.add('menu', MenuState, false);
+	game.state.add('intro', IntroState, true);
+}
