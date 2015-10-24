@@ -96,7 +96,16 @@ var BLOCKS = [
     ["green_bright", "leaf2"],
     ["red_bright", "cannonball"],
     ["turquoise", "butterfly1"],
-    ["turquoise", "piston1"]
+    ["turquoise", "piston1"],
+	["yellow", "pipe_vert_rib"],
+	["yellow", "pipe_horiz_rib"],
+	["yellow", "pipe_vert"],
+	["yellow", "pipe_horiz"],
+	["yellow", "pipe_cross"],
+	["yellow", "pipe_sw"],
+	["yellow", "pipe_se"],
+	["yellow", "pipe_nw"],
+	["yellow", "pipe_ne"]
 ];
 
 EXTRA_INFO = {
@@ -169,6 +178,33 @@ EXTRA_INFO = {
     "lamp": {
         decor: true
     },
+	"pipe_vert_rib": {
+        ladder: true
+    },
+	"pipe_horiz_rib": {
+        ladder: true
+    },
+	"pipe_vert": {
+        ladder: true
+    },
+	"pipe_horiz": {
+        ladder: true
+    },
+	"pipe_cross": {
+        ladder: true
+    },
+	"pipe_sw": {
+        ladder: true
+    },
+	"pipe_se": {
+        ladder: true
+    },
+	"pipe_nw": {
+        ladder: true
+    },
+	"pipe_ne": {
+        ladder: true
+    }
 };
 
 function Textures() {

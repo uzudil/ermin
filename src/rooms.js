@@ -7,8 +7,9 @@ var WORLD = {
     "entryway": ["start", "drawing_room", null, null],
     "drawing_room": ["entryway", "kitchen", null, "cellar"],
  	"kitchen": ["drawing_room", "garden", null, null],
- 	"cellar": [null, "tunnel", "drawing_room", null],
- 	"tunnel": ["cellar", "tunnel2", null, null],
+ 	"cellar": [null, "cellar2", "drawing_room", null],
+ 	"cellar2": ["cellar", "tunnel", null, "pipeline"],
+ 	"tunnel": ["cellar2", "tunnel2", null, null],
  	"tunnel2": ["tunnel", "earth", "garden2", null],
  	"garden": ["kitchen", "garden2", null, null],
  	"garden2": ["garden", "guesthouse", null, "tunnel2"],
@@ -16,7 +17,10 @@ var WORLD = {
  	"earth": ["tunnel2", "earth2", "guesthouse", null],
  	"earth2": ["earth", null, null, "down"],
     "down": [null, null, "earth2", "down2"],
-    "down2": [null, null, "down", null]
+    "down2": [null, null, "down", null],
+	"pipeline": ["chasm", "pipeline2", "cellar2", null],
+	"pipeline2": ["pipeline", null, null, null],
+	"chasm": [null, "pipeline", null, null]
 };
 
 var DESCRIPTIONS = {
@@ -25,6 +29,7 @@ var DESCRIPTIONS = {
     drawing_room: "The Drawing Room",
     kitchen: "The Cook's Palace",
     cellar: "Down in the Cellar",
+    cellar2: "Down in the Cellar",
     tunnel: "An unused tunnel",
     tunnel2: "An unused tunnel",
     garden: "A sunny garden",
@@ -34,6 +39,9 @@ var DESCRIPTIONS = {
     earth2: "Earthworks",
     down: "The Old Well",
     down2: "The Old Well",
+    pipeline: "The leaky pipes",
+    pipeline2: "The leaky pipes",
+    chasm: "The great chasm",
 };
 
 // rooms cache
