@@ -66,14 +66,14 @@ GameState.prototype.create_player = function() {
     this.player = this.game.add.sprite(this.room_entry_pos.x, this.room_entry_pos.y, 'sprites', "ermin");
     this.room_entry_pos = { x: this.player.x, y: this.player.y };
     this.player.tint = 0xffffff;
-    this.player.scale.x = this.PLAYER_SCALE;
-    this.player.scale.y = this.PLAYER_SCALE;
+    this.player.scale.x = ATLAS_SCALE * this.PLAYER_SCALE;
+    this.player.scale.y = ATLAS_SCALE * this.PLAYER_SCALE;
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 2); // x, y
     this.player.body.drag.setTo(this.DRAG, 0); // x, y
 
     // reduce hitbox size a bit
-    this.player.body.setSize(40,40,4,4);
+    this.player.body.setSize(60,60,4,4);
 
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
     this.player.animations.add("climb", ["ermin_climb1", "ermin_climb2"], 10, true, false);
@@ -85,6 +85,7 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
     var block = this.game.add.sprite(x, y, 'sprites', name);
     block.tint = color;
     block.start_key = name;
+	block.scale.set(ATLAS_SCALE);
     this.game.physics.enable(block, Phaser.Physics.ARCADE);
     if(group == this.enemies) {
         if(ENEMIES[name].seq.length > 0) {
@@ -489,7 +490,7 @@ GameState.prototype.tap_player = function() {
         this.tap_timer = 0;
     }
     var d = this.TAP_DELTA * (this.tap_timer / this.TAP_INTERVAL_MILLIS);
-    this.player.scale.y = Math.min(this.PLAYER_SCALE, this.tap_direction == 1 ? (this.PLAYER_SCALE - this.TAP_DELTA) + d : this.PLAYER_SCALE - d);
+    this.player.scale.y = ATLAS_SCALE * Math.min(this.PLAYER_SCALE, this.tap_direction == 1 ? (this.PLAYER_SCALE - this.TAP_DELTA) + d : this.PLAYER_SCALE - d);
 };
 
 GameState.prototype.player_collision_detection = function(onLadder) {
@@ -596,7 +597,7 @@ GameState.prototype.update_game = function() {
         moving = this.player.body.velocity.x != 0;
         if (moving) {
             // directional sprite
-            this.player.scale.x = this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE;
+            this.player.scale.x = ATLAS_SCALE * (this.player.body.velocity.x < 0 ? -this.PLAYER_SCALE : this.PLAYER_SCALE);
         }
     }
 

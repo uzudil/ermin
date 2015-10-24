@@ -3,6 +3,7 @@
 
 var settings = JSON.parse(localStorage["ermin_settings"] || '{ "volume": 1 }');
 var VOLUME = settings.volume; // 0-1
+var ATLAS_SCALE = 0.5;
 
 function get_saved_game() {
     return JSON.parse(localStorage["ermin"] || "{}");

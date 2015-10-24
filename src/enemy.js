@@ -30,7 +30,7 @@ var horizontal_move = function(game_state, sprite, enemy) {
     }
     // directional sprites
     if (sprite.body.velocity.x != 0) {
-        sprite.scale.x = sprite.body.velocity.x < 0 ? -1 : 1;
+        sprite.scale.x = ATLAS_SCALE * (sprite.body.velocity.x < 0 ? -1 : 1);
     }
 };
 
@@ -46,7 +46,7 @@ var zigzag_move = function(game_state, sprite, enemy) {
     }
     // directional sprites
     if (sprite.body.velocity.x != 0) {
-        sprite.scale.x = sprite.body.velocity.x < 0 ? -1 : 1;
+        sprite.scale.x = ATLAS_SCALE * (sprite.body.velocity.x < 0 ? -1 : 1);
     }
 
     if(sprite.body.velocity.y == 0) sprite.body.velocity.y = enemy.speed;

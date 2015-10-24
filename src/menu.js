@@ -66,16 +66,21 @@ MenuState.prototype.create = function() {
 
 
     for(var x = 0; x < this.game.width; x+= 32) {
-        this.game.add.sprite(x, 0, 'sprites', "wall1");
-        this.game.add.sprite(x, my, 'sprites', "wall1");
+        var s = this.game.add.sprite(x, 0, 'sprites', "wall1");
+		s.scale.set(ATLAS_SCALE);
+        s = this.game.add.sprite(x, my, 'sprites', "wall1");
+		s.scale.set(ATLAS_SCALE);
     }
     for(var y = 32; y < this.game.height - 32; y+= 32) {
-        this.game.add.sprite(0, y, 'sprites', "wall1");
-        this.game.add.sprite(this.game.width - 32, y, 'sprites', "wall1");
+        var s = this.game.add.sprite(0, y, 'sprites', "wall1");
+		s.scale.set(ATLAS_SCALE);
+        s = this.game.add.sprite(this.game.width - 32, y, 'sprites', "wall1");
+		s.scale.set(ATLAS_SCALE);
     }
 
     for(var x = this.game.width/2 - 200; x < this.game.width/2 + 200; x+= 16) {
-        this.game.add.sprite(x, this.game.height / 2, 'sprites', "brick2");
+        var s = this.game.add.sprite(x, this.game.height / 2, 'sprites', "brick2");
+		s.scale.set(ATLAS_SCALE);
     }
     this.player = this.game.add.sprite(this.game.width/2 - 200 + 16, this.game.height / 2 - 48, 'sprites', "ermin");
     this.player.anchor.x = 0.5;
@@ -83,6 +88,7 @@ MenuState.prototype.create = function() {
     this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
     this.player.animations.play("walk");
     this.player["dir"] = 1;
+	this.player.scale.set(ATLAS_SCALE);
 
 
     this.enemies = [];
@@ -93,6 +99,7 @@ MenuState.prototype.create = function() {
         enemy.start_key = "butterfly1";
         enemy.animations.add("walk", ENEMIES["butterfly1"].seq, 10, true, false);
         enemy.animations.play("walk");
+		enemy.scale.set(ATLAS_SCALE);
         this.enemies.push(enemy);
     }
 
@@ -159,8 +166,8 @@ MenuState.prototype.update = function() {
     }
 
     this.ermin.rotation += this.ermin.dir[0] * this.ermin.dir[1] * 0.005;
-    this.ermin.scale.x += this.ermin.dir[0] * 0.005;
-    this.ermin.scale.y += this.ermin.dir[1] * 0.005;
+    this.ermin.scale.x += ATLAS_SCALE * this.ermin.dir[0] * 0.005;
+    this.ermin.scale.y += ATLAS_SCALE * this.ermin.dir[1] * 0.005;
     this.ermin.alpha = this.ermin.x / gw * this.ermin.y / gh * 0.05 + 0.05;
 //    var s = Math.sin(this.ermin.position.x / 100)/0.5 + 0.5;
 //    this.ermin.scale.x = 1.2;
@@ -178,7 +185,7 @@ MenuState.prototype.update = function() {
     if((this.player.dir == 1 && this.player.x >= this.game.width/2 + 200 - 16) ||
         (this.player.dir == -1 && this.player.x <= this.game.width/2 - 200 + 16)) {
         this.player.dir *= -1;
-        this.player.scale.x = this.player.dir;
+        this.player.scale.x = ATLAS_SCALE * this.player.dir;
     }
 
     for(var i = 0; i < this.enemies.length; i++) {
