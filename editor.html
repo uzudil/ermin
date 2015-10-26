@@ -9,6 +9,7 @@
 	<script src="src/util.js" ></script>
 	<script src="src/rooms.js" ></script>
 	<script src="src/textures.js" ></script>
+	<script src="src/enemy.js" ></script>
 	<script src="src/editor.js" ></script>
 </head>
 <body>
@@ -23,6 +24,11 @@
     <div id="status">
         <span id="loading" class="status_message">Loading...</span>
         <span id="ready" class="status_message">
+            <select id="block_type">
+                <option>platform</option>
+                <option>enemy</option>
+                <option>decor</option>
+            </select>
             <label>Room: <select id="room_names"></select></label>
             <button type="button" id="load_room">Load</button> /
             <label>Room name: <input size="8" id="room_name"></label>

@@ -10,6 +10,7 @@ function JumperXEditor() {
 
     this.textures = new Textures();
     this.textures.load(bind(this, function() {
+		$("#block_type").change(bind(this, this.filter_blocks));
         $("#save_room").click(bind(this, this.save_room));
         $("#load_room").click(bind(this, this.load_room));
         for(var name in DESCRIPTIONS) $("#room_names").append("<option>" + name + "</option>");
@@ -31,11 +32,26 @@ function JumperXEditor() {
             }
         }
 
-        this.render();
+		this.filter_blocks();
+		this.render();
 
 //        animate();
     }));
 }
+
+JumperXEditor.prototype.filter_blocks = function() {
+	$(".tool_block").hide();
+	$(".tool_block." + $("#block_type").val()).show();
+	$("#main").focus();
+	$("#block_type").blur();
+
+	var tools = $("#tools");
+	var e = $(".tool_block[data-block_index=" + (this.tool_index + 1) + "]", tools);
+	var n = e.prevAll(".tool_block:visible", tools);
+	if(n.length > 0) this.tool_index = $(n[0]).data("block_index") - 1;
+	else this.tool_index = 0;
+	this.render();
+};
 
 JumperXEditor.prototype.load_room = function() {
     get_room($("#room_names").val(), bind(this, function(room_data) {
@@ -76,12 +92,18 @@ JumperXEditor.prototype.game_step = function(dt) {
 };
 
 JumperXEditor.prototype.keydown = function(event) {
+	event.stopPropagation();
     var handled = false;
     if(this.in_tool) {
+		var tools = $("#tools");
+		var e = $(".tool_block[data-block_index=" + (this.tool_index + 1) + "]", tools);
+//		console.log("tool_index=" + this.tool_index);
         if(event.which == 39 || event.which == 40) {
-            if(this.tool_index < $("#tools .tool_block").length - 1) this.tool_index++;
+			var n = e.nextAll(".tool_block:visible", tools);
+			if(n.length > 0) this.tool_index = $(n[0]).data("block_index") - 1;
         } else if(event.which == 37 || event.which == 38) {
-            if(this.tool_index > 0) this.tool_index--;
+			var n = e.prevAll(".tool_block:visible", tools);
+			if(n.length > 0) this.tool_index = $(n[0]).data("block_index") - 1;
         }
         handled = true;
     } else {
@@ -130,6 +152,7 @@ JumperXEditor.prototype.keydown = function(event) {
 };
 
 JumperXEditor.prototype.keyup = function(event) {
+	event.stopPropagation();
 //    console.log(event.which);
     var handled = false;
     if(event.which == 84) {

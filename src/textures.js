@@ -105,7 +105,21 @@ var BLOCKS = [
 	["yellow", "pipe_sw"],
 	["yellow", "pipe_se"],
 	["yellow", "pipe_nw"],
-	["yellow", "pipe_ne"]
+	["yellow", "pipe_ne"],
+	["purple", "wall2"],
+	["purple", "brick1"],
+	["purple", "wall1"],
+	["purple", "brick2"],
+	["purple", "floor1"],
+	["purple", "floor2"],
+	["purple", "floor3"],
+	["turquoise", "wall2"],
+	["turquoise", "brick1"],
+	["turquoise", "wall1"],
+	["turquoise", "brick2"],
+	["turquoise", "floor1"],
+	["turquoise", "floor2"],
+	["turquoise", "floor3"]
 ];
 
 EXTRA_INFO = {
@@ -285,7 +299,13 @@ Textures.prototype.get_div = function(block_index, id, css_class, style) {
     var w = tex.w * BLOCK_SIZE * ATLAS_SCALE;
     var h = tex.h * BLOCK_SIZE * ATLAS_SCALE;
     var src = $("#tex_" + color).attr("data-src");
-    return "<div id='" + id + "' class='" + css_class + "' " +
+	var extra = EXTRA_INFO[block[1]];
+	var enemy = ENEMIES[block[1]];
+	var block_type;
+	if(extra && extra["decor"]) block_type = "decor";
+	else if(enemy) block_type = "enemy";
+	else block_type = "platform";
+    return "<div id='" + id + "' class='" + css_class + " " + block_type + "' " +
         " data-block_index='" + block_index + "' " +
         "style='" +
         " background-image: URL(" + src + "); " +

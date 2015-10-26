@@ -51,7 +51,7 @@ class MapMaker():
 			w = f["w"]
 			h = f["h"]
 			box = (x, y, x + w, y + h,)
-			self.frames[frame["filename"]] = self.tex_img.crop(box).resize((w * TILE / 16, h * TILE / 16,), Image.ANTIALIAS)
+			self.frames[frame["filename"]] = self.tex_img.crop(box).resize((w * TILE / 32, h * TILE / 32,), Image.ANTIALIAS)
 
 	def draw_map(self):
 		room = "start"
