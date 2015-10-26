@@ -45,7 +45,7 @@ var BLOCKS = [
     ["red_bright", "roof1"],
     ["red_bright", "roof2"],
     ["orange_bright", "lamp"],
-    ["yellow", "pipe_up"],
+    ["yellow", "vine"],
     ["red", "wall2"],
     ["blue", "wall2"],
     ["green", "wall2"],
@@ -119,7 +119,9 @@ var BLOCKS = [
 	["turquoise", "brick2"],
 	["turquoise", "floor1"],
 	["turquoise", "floor2"],
-	["turquoise", "floor3"]
+	["turquoise", "floor3"],
+	["yellow", "vine2"],
+	["yellow", "vine3"]
 ];
 
 EXTRA_INFO = {
@@ -133,6 +135,15 @@ EXTRA_INFO = {
         jump_thru: true
     },
     "ladder1": {
+        ladder: true
+    },
+	"vine": {
+        ladder: true
+    },
+	"vine2": {
+        ladder: true
+    },
+	"vine3": {
         ladder: true
     },
     "door_open": {
