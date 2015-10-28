@@ -14,19 +14,21 @@ var WORLD = {
  	"garden": ["kitchen", "garden2", null, null],
  	"garden2": ["garden", "guesthouse", null, "tunnel2"],
  	"guesthouse": ["garden2", null, null, "earth"],
- 	"earth": ["tunnel2", "earth2", "guesthouse", "stairs2"],
+ 	"earth": ["tunnel2", "earth2", "guesthouse", "chapel"],
  	"earth2": ["earth", null, null, "down"],
-    "down": [null, null, "earth2", "down2"],
-    "down2": [null, null, "down", null],
+    "down": ["chapel", null, "earth2", "down2"],
+    "down2": ["down3", null, "down", null],
+	"down3": ["crypt3", "down2", "chapel", null],
 	"pipeline": ["chasm", "pipeline2", "cellar2", "crypt"],
 	"pipeline2": ["pipeline", "stairs", null, "crypt2"],
 	"chasm": [null, "pipeline", null, "chasm2"],
 	"chasm2": [null, "crypt", "chasm", null],
-	"stairs": ["pipeline2", "stairs2", null, "crypt3"],
-	"stairs2": ["stairs", null, "earth", null],
+	"stairs": ["pipeline2", "chapel", null, "crypt3"],
+	"chapel": ["stairs", "down", "earth", "down3"],
 	"crypt": ["chasm2", "crypt2", "pipeline", null],
 	"crypt2": ["crypt", "crypt3", "pipeline2", null],
-	"crypt3": ["crypt2", null, "stairs", null]
+	"crypt3": ["crypt2", "down3", "stairs", null]
+
 };
 
 var DESCRIPTIONS = {
@@ -45,12 +47,13 @@ var DESCRIPTIONS = {
     earth2: "Earthworks",
     down: "The Old Well",
     down2: "The Old Well",
+    down3: "Beneath the Well",
     pipeline: "The leaky pipes",
     pipeline2: "The leaky pipes",
     chasm: "The great chasm",
     chasm2: "The great chasm",
     stairs: "Dusty service tunnels",
-    stairs2: "Dusty service tunnels",
+    chapel: "The Chapel",
 	crypt: "Forgotten crypts",
 	crypt2: "Forgotten crypts",
 	crypt3: "Forgotten crypts"
