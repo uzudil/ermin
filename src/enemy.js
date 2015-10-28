@@ -34,6 +34,26 @@ var horizontal_move = function(game_state, sprite, enemy) {
     }
 };
 
+var horizontal_ghost_move = function(game_state, sprite, enemy) {
+    if(sprite.body.velocity.x == 0) sprite.body.velocity.x = enemy.speed;
+    var to_left = sprite.body.velocity.x < 0;
+    var flip = (sprite.body.touching.left && to_left) ||
+        (sprite.body.touching.right && !to_left) ||
+        (sprite.x <= 0 && to_left) ||
+        (sprite.x >= game_state.game.width - sprite.width && !to_left);
+    if (flip) {
+        sprite.body.velocity.x *= -1;
+    }
+    // directional sprites
+    if (sprite.body.velocity.x != 0) {
+        sprite.scale.x = ATLAS_SCALE * (sprite.body.velocity.x < 0 ? -1 : 1);
+    }
+
+	if(sprite["start_y"] == null) sprite.start_y = sprite.position.y;
+//	sprite.position.y = sprite.position.y + game_state.clock
+	sprite.position.y = sprite.start_y + 10 * Math.sin(sprite.position.x * 0.05);
+};
+
 var zigzag_move = function(game_state, sprite, enemy) {
     if(sprite.body.velocity.x == 0) sprite.body.velocity.x = enemy.speed;
     var to_left = sprite.body.velocity.x < 0;
@@ -214,6 +234,12 @@ var ENEMIES =  {
         seq: [],
         speed: 100,
         move: no_move,
+        gravity: false
+    },
+	"ghost1": {
+        seq: [ "ghost1", "ghost2", "ghost3" ],
+        move: horizontal_ghost_move,
+        speed: 200,
         gravity: false
     }
 };

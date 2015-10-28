@@ -121,7 +121,9 @@ var BLOCKS = [
 	["turquoise", "floor2"],
 	["turquoise", "floor3"],
 	["yellow", "vine2"],
-	["yellow", "vine3"]
+	["yellow", "vine3"],
+	["turquoise", "ghost1"],
+	["white", "skull"]
 ];
 
 EXTRA_INFO = {
@@ -229,6 +231,9 @@ EXTRA_INFO = {
     },
 	"pipe_ne": {
         ladder: true
+    },
+	"skull": {
+        decor: true
     }
 };
 

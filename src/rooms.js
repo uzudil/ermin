@@ -18,13 +18,15 @@ var WORLD = {
  	"earth2": ["earth", null, null, "down"],
     "down": [null, null, "earth2", "down2"],
     "down2": [null, null, "down", null],
-	"pipeline": ["chasm", "pipeline2", "cellar2", null],
-	"pipeline2": ["pipeline", "stairs", null, null],
+	"pipeline": ["chasm", "pipeline2", "cellar2", "crypt"],
+	"pipeline2": ["pipeline", "stairs", null, "crypt2"],
 	"chasm": [null, "pipeline", null, "chasm2"],
 	"chasm2": [null, "crypt", "chasm", null],
-	"stairs": ["pipeline2", "stairs2", null, null],
+	"stairs": ["pipeline2", "stairs2", null, "crypt3"],
 	"stairs2": ["stairs", null, "earth", null],
-	"crypt": ["chasm2", null, "pipeline", null]
+	"crypt": ["chasm2", "crypt2", "pipeline", null],
+	"crypt2": ["crypt", "crypt3", "pipeline2", null],
+	"crypt3": ["crypt2", null, "stairs", null]
 };
 
 var DESCRIPTIONS = {
@@ -49,7 +51,9 @@ var DESCRIPTIONS = {
     chasm2: "The great chasm",
     stairs: "Dusty service tunnels",
     stairs2: "Dusty service tunnels",
-	crypt: "Forgotten crypts"
+	crypt: "Forgotten crypts",
+	crypt2: "Forgotten crypts",
+	crypt3: "Forgotten crypts"
 };
 
 // rooms cache
