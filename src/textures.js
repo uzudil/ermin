@@ -123,7 +123,9 @@ var BLOCKS = [
 	["yellow", "vine2"],
 	["yellow", "vine3"],
 	["turquoise", "ghost1"],
-	["white", "skull"]
+	["white", "skull"],
+	["white", "grave1"],
+	["white", "grave2"]
 ];
 
 EXTRA_INFO = {
@@ -233,6 +235,12 @@ EXTRA_INFO = {
         ladder: true
     },
 	"skull": {
+        decor: true
+    },
+	"grave1": {
+        decor: true
+    },
+	"grave2": {
         decor: true
     }
 };

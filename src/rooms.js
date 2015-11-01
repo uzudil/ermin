@@ -17,7 +17,7 @@ var WORLD = {
  	"earth": ["tunnel2", "earth2", "guesthouse", "chapel"],
  	"earth2": ["earth", null, null, "down"],
     "down": ["chapel", null, "earth2", "down2"],
-    "down2": ["down3", null, "down", null],
+    "down2": ["down3", "outside", "down", null],
 	"down3": ["crypt3", "down2", "chapel", null],
 	"pipeline": ["chasm", "pipeline2", "cellar2", "crypt"],
 	"pipeline2": ["pipeline", "stairs", null, "crypt2"],
@@ -27,7 +27,9 @@ var WORLD = {
 	"chapel": ["stairs", "down", "earth", "down3"],
 	"crypt": ["chasm2", "crypt2", "pipeline", null],
 	"crypt2": ["crypt", "crypt3", "pipeline2", null],
-	"crypt3": ["crypt2", "down3", "stairs", null]
+	"crypt3": ["crypt2", "down3", "stairs", null],
+	"outside": ["down2", "graves1", null, null],
+	"graves1": ["outside", null, null, null]
 
 };
 
@@ -56,7 +58,9 @@ var DESCRIPTIONS = {
     chapel: "The Chapel",
 	crypt: "Forgotten crypts",
 	crypt2: "Forgotten crypts",
-	crypt3: "Forgotten crypts"
+	crypt3: "Forgotten crypts",
+	outside: "In the Ravine",
+	graves1: "The old cemetery"
 };
 
 // rooms cache
