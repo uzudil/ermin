@@ -21,6 +21,7 @@ GameState.prototype.preload = function() {
     this.mobile_controller_pos = { dx: 0, dy: 0, jump_active: false };
     this.PLAYER_SCALE = 0.9; // downscale the player so it fits into same-size places
     this.player_keys = sg["player_keys"] || {};
+	this.has_disk = sg["has_disk"] || false;
     this.score = sg["score"] || 0;
     this.lives = sg["lives"] || 5;
     this.room_entry_pos = sg["room_entry_pos"] || { x: this.game.width/4, y: 300 };
@@ -353,20 +354,21 @@ GameState.prototype.enemyOverlap = function(player, enemy) {
 };
 
 GameState.prototype.pickupOverlap = function(player, pickup) {
+	this.pickups.remove(pickup);
+	this.stored_room.pickups.push([pickup.x, pickup.y]);
     if(pickup.frameName == "key") {
-        this.pickups.remove(pickup);
         if(pickup.tint in this.player_keys) {
             this.player_keys[pickup.tint] = this.player_keys[pickup.tint] + 1;
         } else {
             this.player_keys[pickup.tint] = 1;
         }
-        this.stored_room.pickups.push([pickup.x, pickup.y]);
         this.update_inventory();
     } else if(pickup.frameName == "coin") {
-        this.pickups.remove(pickup);
-        this.stored_room.pickups.push([pickup.x, pickup.y]);
         this.score += 5;
         this.score_text.text = "Score: " + this.score;
+    } else if(pickup.frameName == "disk") {
+		this.has_disk = true;
+		this.update_inventory();
     }
 };
 
@@ -374,6 +376,10 @@ GameState.prototype.update_inventory = function() {
     this.inventory.removeAll();
     var x = this.CONTROLLER_SIZE;
     var y = this.game.height - this.BOTTOM_GUTTER + 10;
+	if(this.has_disk) {
+		this.create_block(x + 5, y - 5, "disk", this.inventory, PALETTE.turquoise[0]);
+		x += 40;
+	}
     for(var tint in this.player_keys) {
         var count = this.player_keys[tint];
         if(count > 0) {
@@ -635,6 +641,7 @@ GameState.prototype.save_game_state = function(next_room) {
     sg["lives"] = this.lives;
     sg["score"] = this.score;
     sg["player_keys"] = this.player_keys;
+    sg["has_disk"] = this.has_disk;
     sg[this.room] = this.stored_room;
     sg["room"] = next_room || this.room;
     sg["room_entry_pos"] = this.room_entry_pos;

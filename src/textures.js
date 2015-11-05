@@ -251,7 +251,10 @@ EXTRA_INFO = {
     },
 	"plane2": {
         decor: true
-    }
+    },
+	"disk": {
+		pickup: true
+	}
 };
 
 function Textures() {
