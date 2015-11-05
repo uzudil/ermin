@@ -109,6 +109,7 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
 GameState.prototype.create_room = function(name) {
     this.game.physics.arcade.isPaused = true;
     get_room(name, bind(this, function(room) {
+		this.disk_text.visible = name == "chapel";
         this.room = name;
         this.stored_room = this.getStoredRoom();
         this.text.text = DESCRIPTIONS[this.room];
@@ -264,6 +265,12 @@ GameState.prototype.create = function() {
 //    this.text.tint = 0xff8800;
     this.lives_text.anchor.x = 1;
     this.lives_text.anchor.y = 0.5;
+
+    this.disk_text = this.game.add.bitmapText(this.game.width/2 - 40, this.game.height - 250, 'ermin', "Bring me my disk!", 16);
+	this.disk_text.visible = false;
+    this.disk_text.tint = 0xffff00;
+    this.disk_text.anchor.x = 0.5;
+    this.disk_text.anchor.y = 0.5;
 
     this.create_room(this.room);
 
@@ -634,6 +641,10 @@ GameState.prototype.update_game = function() {
         // switch rooms
         this.create_room(load_room);
     }
+
+	if(this.disk_text.visible) {
+		this.disk_text.alpha = (Math.sin(this.game.time.time * 0.005) * 0.4) + 0.6;
+	}
 };
 
 GameState.prototype.save_game_state = function(next_room) {
