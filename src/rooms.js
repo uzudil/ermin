@@ -29,7 +29,9 @@ var WORLD = {
 	"crypt2": ["crypt", "crypt3", "pipeline2", null],
 	"crypt3": ["crypt2", "down3", "stairs", null],
 	"outside": ["down2", "graves1", null, null],
-	"graves1": ["outside", null, null, null]
+	"graves1": ["outside", "graves2", null, null],
+	"graves2": ["graves1", "cave", null, null],
+	"cave": ["graves2", null, null, null]
 
 };
 
@@ -60,7 +62,9 @@ var DESCRIPTIONS = {
 	crypt2: "Forgotten crypts",
 	crypt3: "Forgotten crypts",
 	outside: "In the Ravine",
-	graves1: "The old cemetery"
+	graves1: "The old cemetery",
+	graves2: "The old cemetery",
+	cave: "Under the hill"
 };
 
 // rooms cache

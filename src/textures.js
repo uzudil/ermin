@@ -125,7 +125,10 @@ var BLOCKS = [
 	["turquoise", "ghost1"],
 	["white", "skull"],
 	["white", "grave1"],
-	["white", "grave2"]
+	["white", "grave2"],
+	["white", "plane1"],
+	["white", "plane2"],
+	["turquoise", "disk"]
 ];
 
 EXTRA_INFO = {
@@ -241,6 +244,12 @@ EXTRA_INFO = {
         decor: true
     },
 	"grave2": {
+        decor: true
+    },
+	"plane1": {
+        decor: true
+    },
+	"plane2": {
         decor: true
     }
 };
