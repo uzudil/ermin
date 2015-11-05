@@ -241,5 +241,11 @@ var ENEMIES =  {
         move: horizontal_ghost_move,
         speed: 200,
         gravity: false
+    },
+	"alien1": {
+        seq: [ "alien1", "alien3", "alien3" ],
+        move: horizontal_move,
+        speed: 50,
+        gravity: true
     }
 };

@@ -128,7 +128,8 @@ var BLOCKS = [
 	["white", "grave2"],
 	["white", "plane1"],
 	["white", "plane2"],
-	["turquoise", "disk"]
+	["turquoise", "disk"],
+	["yellow", "alien1"],
 ];
 
 EXTRA_INFO = {
