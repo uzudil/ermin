@@ -22,6 +22,9 @@ GameState.prototype.preload = function() {
     this.PLAYER_SCALE = 0.9; // downscale the player so it fits into same-size places
     this.player_keys = sg["player_keys"] || {};
 	this.has_disk = sg["has_disk"] || false;
+	this.game_won = false;
+	this.game_label = null;
+	this.over_label = null;
     this.score = sg["score"] || 0;
     this.lives = sg["lives"] || 5;
     this.room_entry_pos = sg["room_entry_pos"] || { x: this.game.width/4, y: 300 };
@@ -38,6 +41,7 @@ GameState.prototype.preload = function() {
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
     this.game.load.audio('music', 'data/ermin.mp3?cb=' + Date.now());
+    this.game.load.audio('game_won_music', 'data/win.mp3?cb=' + Date.now());
 
     this.accelerated = this.game.renderType == Phaser.WEBGL;
     this.CONTROLLER_SIZE = this.game.device.desktop ? 0 : 160;
@@ -272,6 +276,12 @@ GameState.prototype.create = function() {
     this.disk_text.anchor.x = 0.5;
     this.disk_text.anchor.y = 0.5;
 
+    this.game_over_text = this.game.add.bitmapText(this.game.width/2 - 40, 150, 'ermin', "Press SPACE to exit", 16);
+	this.game_over_text.visible = false;
+    this.game_over_text.tint = 0xffff00;
+    this.game_over_text.anchor.x = 0.5;
+    this.game_over_text.anchor.y = 0.5;
+
     this.create_room(this.room);
 
     // create the player last
@@ -299,6 +309,7 @@ GameState.prototype.create = function() {
 
     // music
     this.music = this.game.add.audio('music');
+    this.game_won_music = this.game.add.audio('game_won_music');
 	this.game.sound.volume = VOLUME;
     this.music.loop = true;
     this.music.play();
@@ -353,11 +364,56 @@ GameState.prototype.get_mobile_controller_position = function(onLadder) {
 };
 
 GameState.prototype.enemyOverlap = function(player, enemy) {
-    this.player_death = Date.now() + 3000;
-    this.game.physics.arcade.isPaused = true;
-    this.lives--;
-    this.lives_text.text = "Lives: " + this.lives;
-    this.save_game_state();
+	if(enemy.start_key == "alien1" && this.has_disk) {
+		this.game.physics.arcade.isPaused = true;
+		this.game_won = true;
+		this.game_label = this.create_block(-150, this.game.height/2 + 65 - 24, "game", this.decor, 0xff0000);
+		this.game_label.anchor.set(0.5, 0.5);
+		this.over_label = this.create_block(this.game.width + 150, this.game.height/2 + 65 + 24, "over", this.decor, 0x00ff00);
+		this.over_label.anchor.set(0.5, 0.5);
+		this.player.animations.paused = true;
+		this.enemies.visible = false;
+		this.disk_text.visible = false;
+		this.music.loop = false;
+		this.music.stop();
+		this.game_won_music.play();
+	} else {
+		if(!this.god_mode) {
+			this.player_death = Date.now() + 3000;
+			this.game.physics.arcade.isPaused = true;
+			this.lives--;
+			this.lives_text.text = "Lives: " + this.lives;
+			this.save_game_state();
+		}
+	}
+};
+
+GameState.prototype.update_game_won = function() {
+	var mx = this.game.width / 2;
+	if(this.game_label.x < mx - 64) {
+		this.game_label.x += this.game.time.elapsed * 0.1;
+		if(this.game_label.x > mx - 64) this.game_label.x = mx - 64;
+	}
+	if(this.over_label.x > mx + 32) {
+		this.over_label.x -= this.game.time.elapsed * 0.1;
+		if(this.over_label.x < mx + 32) this.over_label.x = mx + 32;
+	}
+	var game_won_return_to_menu = this.game_label.x == mx - 64 && this.over_label.x == mx + 32;
+	if(game_won_return_to_menu) {
+		if(!this.game_over_text.visible) {
+			this.game_over_text.visible = true;
+			this.game_over_text.events.onInputOver.add(function(item, pointer) {
+				if(pointer != this.game.input.mousePointer) {
+					this.game_won_music.stop();
+					this.game.state.start("menu");
+				}
+			}, this);
+		}
+		if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			this.game_won_music.stop();
+			this.game.state.start("menu");
+		}
+	}
 };
 
 GameState.prototype.pickupOverlap = function(player, pickup) {
@@ -625,9 +681,7 @@ GameState.prototype.update_game = function() {
     this.enemies.forEach(this.move_enemy, this, true);
 
     // enemies collision check
-    if(!this.god_mode) {
-        this.game.physics.arcade.overlap(this.player, this.enemies.children, this.enemyOverlap, null, this);
-    }
+	this.game.physics.arcade.overlap(this.player, this.enemies.children, this.enemyOverlap, null, this);
 
     // screen boundary checking
     var load_room = this.check_screen_edges();
@@ -661,7 +715,9 @@ GameState.prototype.save_game_state = function(next_room) {
 
 GameState.prototype.update = function() {
     if(this.player_death != 0) {
-        this.update_player_death()
+		this.update_player_death();
+	} else if(this.game_won) {
+		this.update_game_won();
     } else {
         this.update_game();
     }

@@ -129,7 +129,8 @@ var BLOCKS = [
 	["white", "plane1"],
 	["white", "plane2"],
 	["turquoise", "disk"],
-	["yellow", "alien1"]
+	["yellow", "alien1"],
+	["white", "cloud"]
 ];
 
 EXTRA_INFO = {
@@ -255,7 +256,10 @@ EXTRA_INFO = {
     },
 	"disk": {
 		pickup: true
-	}
+	},
+	"cloud": {
+        decor: true
+    }
 };
 
 function Textures() {
