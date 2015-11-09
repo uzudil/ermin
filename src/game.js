@@ -404,14 +404,12 @@ GameState.prototype.update_game_won = function() {
 			this.game_over_text.visible = true;
 			this.game_over_text.events.onInputOver.add(function(item, pointer) {
 				if(pointer != this.game.input.mousePointer) {
-					this.game_won_music.stop();
-					this.game.state.start("menu");
+					this.return_to_menu(true);
 				}
 			}, this);
 		}
 		if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			this.game_won_music.stop();
-			this.game.state.start("menu");
+			this.return_to_menu(true);
 		}
 	}
 };
@@ -523,7 +521,11 @@ GameState.prototype.check_screen_edges = function() {
     return load_room;
 };
 
-GameState.prototype.return_to_menu = function() {
+GameState.prototype.return_to_menu = function(clear_save) {
+	if(clear_save) {
+		delete_saved_game();
+	}
+	this.game.physics.arcade.isPaused = false;
 	this.music.loop = false;
 	this.music.stop();
 	this.game.state.start("menu");
@@ -544,8 +546,7 @@ GameState.prototype.update_player_death = function() {
             this.player_death = 0;
             this.game.physics.arcade.isPaused = false;
             if(this.lives <= 0) {
-                delete_saved_game();
-				this.return_to_menu();
+				this.return_to_menu(true);
 			}
         }
     }
