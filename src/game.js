@@ -37,6 +37,9 @@ GameState.prototype.preload = function() {
     this.tap_timer = 0;
     this.TAP_INTERVAL_MILLIS = 160; // pulse to music beat
     this.TAP_DELTA = 0.1;
+	this.offset_x = 0;
+	this.offset_y = 0;
+	this.room_scrolling = false;
 
     this.game.load.bitmapFont('ermin', 'data/ermin/font.png', 'data/ermin/font.fnt');
     this.game.load.atlas('sprites', 'data/tex.png?cb=' + Date.now(), 'data/tex.json?cb=' + Date.now(), Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
@@ -112,19 +115,20 @@ GameState.prototype.create_block = function(x, y, name, group, color) {
 
 GameState.prototype.create_room = function(name) {
     this.game.physics.arcade.isPaused = true;
+	if(this.player) this.player.visible = false;
     get_room(name, bind(this, function(room) {
 		this.disk_text.visible = name == "chapel";
         this.room = name;
         this.stored_room = this.getStoredRoom();
         this.text.text = DESCRIPTIONS[this.room];
 
-        this.ground.removeAll();
-        this.platforms.removeAll();
-        this.ladders.removeAll();
-        this.decor.removeAll();
-        this.enemies.removeAll();
-        this.doors.removeAll();
-        this.pickups.removeAll();
+		this.old_room.removeAll();
+		for(var i = 0; i < this.groups.length; i++) {
+			this.groups[i].moveAll(this.old_room);
+			this.groups[i].removeAll();
+			this.groups[i].x = this.offset_x;
+			this.groups[i].y = this.offset_y;
+		}
 
         for(var x = 0; x < room.length; x++) {
             for(var y = 0; y < room[x].length; y++) {
@@ -170,8 +174,8 @@ GameState.prototype.create_room = function(name) {
                 }
             }
         }
-        this.game.physics.arcade.isPaused = false;
-    }));
+		this.room_rendered();
+	}));
 };
 
 GameState.prototype.create_mobile_controller = function() {
@@ -239,14 +243,16 @@ GameState.prototype.create = function() {
         Phaser.Keyboard.SPACEBAR
     ]);
 
+    this.old_room = this.game.add.group();
     this.ground = this.game.add.group();
     this.platforms = this.game.add.group();
-    this.ladders = this.game.add.group();
     this.ladders = this.game.add.group();
     this.decor = this.game.add.group();
     this.enemies = this.game.add.group();
     this.doors = this.game.add.group();
     this.pickups = this.game.add.group();
+
+    this.world.add(this.old_room);
     this.world.add(this.ground);
     this.world.add(this.platforms);
     this.world.add(this.ladders);
@@ -254,6 +260,8 @@ GameState.prototype.create = function() {
     this.world.add(this.enemies);
     this.world.add(this.doors);
     this.world.add(this.pickups);
+
+	this.groups = [ this.ground, this.platforms, this.ladders, this.decor, this.enemies, this.doors, this.pickups ];
 
     this.text = this.game.add.bitmapText(this.CONTROLLER_SIZE + 16, 16, 'ermin', "", 16);
 //    this.text.tint = 0xff8800;
@@ -488,6 +496,9 @@ GameState.prototype.move_enemy = function(child) {
 };
 
 GameState.prototype.check_screen_edges = function() {
+	this.offset_x = 0;
+	this.offset_y = 0;
+	this.room_scrolling = false;
     var pw = Math.abs(this.player.width);
     var ph = Math.abs(this.player.height);
     var load_room = null;
@@ -495,6 +506,7 @@ GameState.prototype.check_screen_edges = function() {
         load_room = WORLD[this.room][0];
         if(load_room) {
             this.player.x = this.game.width - pw;
+			this.offset_x = -this.game.width;
         } else {
             this.player.x = 0;
         }
@@ -502,6 +514,7 @@ GameState.prototype.check_screen_edges = function() {
         load_room = WORLD[this.room][1];
         if(load_room) {
             this.player.x = 0;
+			this.offset_x = this.game.width;
         } else {
             this.player.x = this.game.width - pw;
         }
@@ -510,6 +523,7 @@ GameState.prototype.check_screen_edges = function() {
         load_room = WORLD[this.room][2];
         if(load_room) {
             this.player.y = this.game.height - ph;
+			this.offset_y = -this.game.height;
         } else {
             this.player.y = 0;
         }
@@ -517,6 +531,7 @@ GameState.prototype.check_screen_edges = function() {
         load_room = WORLD[this.room][3];
         if(load_room) {
             this.player.y = 0;
+			this.offset_y = this.game.height;
         } else {
             this.player.y = this.game.height - ph;
         }
@@ -717,11 +732,54 @@ GameState.prototype.save_game_state = function(next_room) {
     save_game(sg);
 };
 
+GameState.prototype.room_rendered = function() {
+	this.room_scrolling = this.offset_x || this.offset_y;
+	if(!this.room_scrolling) {
+		this.game.physics.arcade.isPaused = false;
+		this.old_room.removeAll();
+		this.old_room.x = 0;
+		this.old_room.y = 0;
+		if(this.player) {
+			this.player.visible = true;
+			this.player.body.velocity.set(0, 0);
+		}
+	}
+};
+
+GameState.prototype.scroll_room = function() {
+	var d = this.game.time.elapsed * 1.2;
+	var dx = 0;
+	var dy = 0;
+	if(this.offset_x > 0) {
+		dx = -Math.min(d, this.offset_x);
+	}
+	if(this.offset_x < 0) {
+		dx = Math.min(d, -this.offset_x);
+	}
+	if(this.offset_y > 0) {
+		dy = -Math.min(d, this.offset_y);
+	}
+	if(this.offset_y < 0) {
+		dy = Math.min(d, -this.offset_y);
+	}
+	this.offset_x += dx;
+	this.offset_y += dy;
+	for(var i = 0; i < this.groups.length; i++) {
+		this.groups[i].x = this.offset_x;
+		this.groups[i].y = this.offset_y;
+	}
+	this.old_room.x += dx;
+	this.old_room.y += dy;
+	this.room_rendered();
+};
+
 GameState.prototype.update = function() {
     if(this.player_death != 0) {
 		this.update_player_death();
 	} else if(this.game_won) {
 		this.update_game_won();
+	} else if(this.room_scrolling) {
+		this.scroll_room();
     } else {
         this.update_game();
     }
