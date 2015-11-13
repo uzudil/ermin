@@ -36,11 +36,12 @@ MenuState.prototype.create = function() {
     this.logo.y = 80;
 
     var t = this.game.add.bitmapText(this.game.width/2, 160, 'ermin',
-			"Ermin's house is haunted by a strange energy.\n" +
-			"Find the source of the problem and restore his\n" +
-			"peaceful house.\n\n" +
-			"Along the way, avoid the monsters and nasty\n" +
-			"traps brought to life by this mysterious force.\n\n" +
+			"Ermin's house is haunted by a strange\n" +
+			"energy. Find the source of the problem\n" +
+			"and restore his peaceful house.\n\n" +
+			"Along the way, avoid the monsters and\n" +
+			"nasty traps brought to life by this\n" +
+			"mysterious force.\n\n" +
 			"2015 (c) HoS Inc", 16);
     t.anchor.x = 0.5;
     t.anchor.y = 0;

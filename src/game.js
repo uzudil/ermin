@@ -427,6 +427,9 @@ GameState.prototype.pickupOverlap = function(player, pickup) {
     } else if(pickup.frameName == "coin") {
         this.score += 5;
         this.score_text.text = "Score: " + this.score;
+    } else if(pickup.frameName == "heart") {
+        this.lives++;
+        this.lives_text.text = "Lives: " + this.lives;
     } else if(pickup.frameName == "disk") {
 		this.has_disk = true;
 		this.update_inventory();
