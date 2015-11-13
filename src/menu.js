@@ -27,34 +27,34 @@ MenuState.prototype.windowResized = function() {
 MenuState.prototype.create = function() {
     this.game.stage.backgroundColor = '#111111';
 
-    this.ermin = this.game.add.sprite(0, 0, "ermin");
-    this.ermin.anchor.x = 0.5;
-    this.ermin.anchor.y = 0.5;
-    this.ermin["dir"] = [1, 1];
-
     this.logo = this.game.add.sprite(0, 0, "ermin");
     this.logo.anchor.x = 0.5;
     this.logo.anchor.y = 0.5;
-    this.logo.scale.x = 0.5;
-    this.logo.scale.y = 0.5;
+    this.logo.scale.x = 0.25;
+    this.logo.scale.y = 0.25;
     this.logo.x = this.game.width / 2;
-    this.logo.y = 124;
+    this.logo.y = 80;
 
-    var my = ((this.game.height/32)|0) * 32;
-    this.copyright = this.game.add.bitmapText(this.game.width/2, my - 8, 'ermin', "2015 (c) Heads on Stick, Inc.", 8);
-    this.copyright.anchor.x = 0.5;
-    this.copyright.anchor.y = 0.5;
+    var t = this.game.add.bitmapText(this.game.width/2, 160, 'ermin',
+			"Ermin's house is haunted by a strange energy.\n" +
+			"Find the source of the problem and restore his\n" +
+			"peaceful house.\n\n" +
+			"Along the way, avoid the monsters and nasty\n" +
+			"traps brought to life by this mysterious force.\n\n" +
+			"2015 (c) HoS Inc", 16);
+    t.anchor.x = 0.5;
+    t.anchor.y = 0;
 
-    this.volume_message = this.game.add.bitmapText(this.game.width/2, this.game.height - 120, 'ermin', "Q - toggle music", 8);
+    this.volume_message = this.game.add.bitmapText(this.game.width/2, this.game.height - 120, 'ermin', "Q - toggle music", 16);
     this.volume_message.anchor.x = 0.5;
     this.volume_message.anchor.y = 0.5;
 
-    this.start_shadow = this.game.add.bitmapText(this.game.width/2 + 3, this.game.height - 150 + 3, 'ermin', "Start Game", 32);
+    this.start_shadow = this.game.add.bitmapText(this.game.width/2 + 3, this.game.height/2 + 60 + 3, 'ermin', "Press SPACE to start", 16);
     this.start_shadow.anchor.x = 0.5;
     this.start_shadow.anchor.y = 0.5;
     this.start_shadow.tint = 0x000000;
 
-    this.start = this.game.add.bitmapText(this.game.width/2, this.game.height - 150, 'ermin', "Start Game", 32);
+    this.start = this.game.add.bitmapText(this.game.width/2, this.game.height/2 + 60, 'ermin', "Press SPACE to start", 16);
     this.start.anchor.x = 0.5;
     this.start.anchor.y = 0.5;
     this.start["game"] = this.game;
@@ -63,45 +63,6 @@ MenuState.prototype.create = function() {
     this.start.events.onInputUp.add(this.start_game, this);
     this.start.events.onInputOver.add(this.start_in, this);
     this.start.events.onInputOut.add(this.start_out, this);
-
-
-    for(var x = 0; x < this.game.width; x+= 32) {
-        var s = this.game.add.sprite(x, 0, 'sprites', "wall1");
-		s.scale.set(ATLAS_SCALE);
-        s = this.game.add.sprite(x, my, 'sprites', "wall1");
-		s.scale.set(ATLAS_SCALE);
-    }
-    for(var y = 32; y < this.game.height - 32; y+= 32) {
-        var s = this.game.add.sprite(0, y, 'sprites', "wall1");
-		s.scale.set(ATLAS_SCALE);
-        s = this.game.add.sprite(this.game.width - 32, y, 'sprites', "wall1");
-		s.scale.set(ATLAS_SCALE);
-    }
-
-    for(var x = this.game.width/2 - 200; x < this.game.width/2 + 200; x+= 16) {
-        var s = this.game.add.sprite(x, this.game.height / 2, 'sprites', "brick2");
-		s.scale.set(ATLAS_SCALE);
-    }
-    this.player = this.game.add.sprite(this.game.width/2 - 200 + 16, this.game.height / 2 - 48, 'sprites', "ermin");
-    this.player.anchor.x = 0.5;
-    this.player.anchor.y = 0;
-    this.player.animations.add("walk", ["ermin1", "ermin", "ermin2"], 10, true, false);
-    this.player.animations.play("walk");
-    this.player["dir"] = 1;
-	this.player.scale.set(ATLAS_SCALE);
-
-
-    this.enemies = [];
-    for(var i = 0; i < 3; i++) {
-        var enemy = this.game.add.sprite(Math.random() * this.game.width - 64 + 32, Math.random() * this.game.height - 64 + 32, 'sprites', "butterfly1");
-        this.game.physics.enable(enemy, Phaser.Physics.ARCADE);
-        enemy.body.allowGravity = ENEMIES["butterfly1"].gravity;
-        enemy.start_key = "butterfly1";
-        enemy.animations.add("walk", ENEMIES["butterfly1"].seq, 10, true, false);
-        enemy.animations.play("walk");
-		enemy.scale.set(ATLAS_SCALE);
-        this.enemies.push(enemy);
-    }
 
 	this.game.input.keyboard.addKey(Phaser.Keyboard.Q).onUp.add(toggle_volume);
 	this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onUp.add(function() {
@@ -136,43 +97,6 @@ MenuState.prototype.start_out = function(item) {
 };
 
 MenuState.prototype.update = function() {
-    var gw = this.game.width;
-    var ew = this.ermin.width;
-    var gh = this.game.height;
-    var eh = this.ermin.height;
-
-    var speed = this.game.time.elapsed * 0.1;
-    if(this.ermin.dir[0] == 1) {
-        this.ermin.position.x += speed;
-        if(this.ermin.position.x >= gw) {
-            this.ermin.dir[0] = -1;
-        }
-    } else {
-        this.ermin.position.x -= speed;
-        if(this.ermin.position.x < 0) {
-            this.ermin.dir[0] = 1;
-        }
-    }
-    if(this.ermin.dir[1] == 1) {
-        this.ermin.position.y += speed;
-        if(this.ermin.position.y >= gh) {
-            this.ermin.dir[1] = -1;
-        }
-    } else {
-        this.ermin.position.y -= speed;
-        if(this.ermin.position.y < 0) {
-            this.ermin.dir[1] = 1;
-        }
-    }
-
-    this.ermin.rotation += this.ermin.dir[0] * this.ermin.dir[1] * 0.005;
-    this.ermin.scale.x += ATLAS_SCALE * this.ermin.dir[0] * 0.005;
-    this.ermin.scale.y += ATLAS_SCALE * this.ermin.dir[1] * 0.005;
-    this.ermin.alpha = this.ermin.x / gw * this.ermin.y / gh * 0.05 + 0.05;
-//    var s = Math.sin(this.ermin.position.x / 100)/0.5 + 0.5;
-//    this.ermin.scale.x = 1.2;
-//    this.ermin.scale.y = 1.2;
-
     var angle = this.game.time.now * 0.001;
     var r = (((Math.sin(angle) * 128) + 128)|0);
     var g = (((Math.sin(angle * 0.5) * 128) + 128)|0);
@@ -180,16 +104,4 @@ MenuState.prototype.update = function() {
     var color = (r << 16) + (g << 8) + b;
     this.logo.tint = color;
     this.start.tint = color;
-
-    this.player.x += this.player.dir * this.game.time.elapsed * 0.1;
-    if((this.player.dir == 1 && this.player.x >= this.game.width/2 + 200 - 16) ||
-        (this.player.dir == -1 && this.player.x <= this.game.width/2 - 200 + 16)) {
-        this.player.dir *= -1;
-        this.player.scale.x = ATLAS_SCALE * this.player.dir;
-    }
-
-    for(var i = 0; i < this.enemies.length; i++) {
-        var en = ENEMIES[this.enemies[i].start_key];
-        en.move(this, this.enemies[i], en);
-    }
 };
